@@ -44,6 +44,24 @@ class IfSwitchExam {
 		}
 		System.out.println("grade : " + grade2);
 		
+		// num의 값을 10단위로 끊어 1이상 10이하, 11이상 20이하, 21이상 30이하,
+		// 30초과로 출력
+
+		int num =23;
+		switch ((num+9)/10) {
+			case 1:
+				System.out.println("1이상 10이하");
+				break;
+			case 2:
+				System.out.println("11이상 20이하");
+				break;
+			case 3:
+				System.out.println("21이상 30이하");
+				break;
+			default:
+				System.out.println("30 초과");
+		
+		}
 
 
 	}

@@ -1,13 +1,13 @@
-class VariableEx1 { //ì†ë„ë¥¼ ìœ„í•´ ctrl+c ctral+v ì´ìš©í•  ê²ƒ
+class VariableEx1 { //¼Óµµ¸¦ À§ÇØ ctrl+c ctral+v ÀÌ¿ëÇÒ °Í
 	public static void main(String[] args) {
-		boolean b1; // booleaní˜• ë³€ìˆ˜ b1ì„ ì„ ì–¸ ë° ìƒì„± (ì„ ì–¸ê³¼ ìƒì„±ì´ ë‹¤ë¥¸ ê²½ìš°ë„ ìžˆìŒ)
-		b1 = false; // ë³€ìˆ˜ì— ì²˜ìŒ ê°’ì„ ë„£ëŠ” í–‰ìœ„ë¥¼ 'ì´ˆê¸°í™”'ë¼ê³  í•¨
-		// ë  ìˆ˜ ìžˆìœ¼ë©´ ë³€ìˆ˜ì˜ ì´ˆê¸°í™”ëŠ” ë¹¨ë¦¬ í•  ìˆ˜ë¡ ì¢‹ë‹¤. ì‚¬ëžŒì´ ë³´ë©´ í—·ê°ˆë¦¼
+		boolean b1; // booleanÇü º¯¼ö b1À» ¼±¾ð ¹× »ý¼º (¼±¾ð°ú »ý¼ºÀÌ ´Ù¸¥ °æ¿ìµµ ÀÖÀ½)
+		b1 = false; // º¯¼ö¿¡ Ã³À½ °ªÀ» ³Ö´Â ÇàÀ§¸¦ 'ÃÊ±âÈ­'¶ó°í ÇÔ
+		// µÉ ¼ö ÀÖÀ¸¸é º¯¼öÀÇ ÃÊ±âÈ­´Â »¡¸® ÇÒ ¼ö·Ï ÁÁ´Ù. »ç¶÷ÀÌ º¸¸é Çò°¥¸²
 
-		char c1 = 'a';	// ë³€ìˆ˜ ì„ ì–¸ê³¼ ë™ì‹œì— ì´ˆê¸°í™”ë¥¼ í•  ìˆ˜ë„ ìžˆìŒ    * ë”°ë¡œ í•´ì•¼ í•˜ëŠ”ê²ƒ ë­ì˜€ëŠ”ì§€ ì°¾ì•„ë³´ê¸°
+		char c1 = 'a';	// º¯¼ö ¼±¾ð°ú µ¿½Ã¿¡ ÃÊ±âÈ­¸¦ ÇÒ ¼öµµ ÀÖÀ½    * µû·Î ÇØ¾ß ÇÏ´Â°Í ¹¹¿´´ÂÁö Ã£¾Æº¸±â
 
 		int i1 = 10, i2 = 20, i3;
-		// ê°™ì€ ìžë£Œí˜•ì˜ ë³€ìˆ˜ëŠ” ì‰¼í‘œë¡œ êµ¬ë¶„í•˜ì—¬ ì—¬ëŸ¬ ê°œë¥¼ í•œ ì¤„ì— ì„ ì–¸í•  ìˆ˜ ìžˆìŒ
+		// °°Àº ÀÚ·áÇüÀÇ º¯¼ö´Â ½°Ç¥·Î ±¸ºÐÇÏ¿© ¿©·¯ °³¸¦ ÇÑ ÁÙ¿¡ ¼±¾ðÇÒ ¼ö ÀÖÀ½
 		i3 = i1 + i2;
 		System.out.println("b1 : " + b1);
 		System.out.println("c1 : " + c1);
