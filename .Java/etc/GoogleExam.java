@@ -21,11 +21,22 @@ class GoogleExam{
 
 		//2. String을 활용한 방법
 		String seq = "";
+		int count2 = 0;
 		for (int i=1;i<=1000;i++){
 			seq += i;
 		}
 
-		System.out.println(seq);
+		while (!seq.isEmpty()){
+			if (seq.equals(seq.substring(seq.indexOf('8')+1))){
+				seq="";
+			}else{
+				seq=seq.substring(seq.indexOf('8')+1);
+				count2 ++;
+			}
+		}
+
+		System.out.println("8의 개수 : " + count2);
+
 
 	}
 }
