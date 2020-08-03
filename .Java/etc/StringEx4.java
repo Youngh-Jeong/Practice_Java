@@ -17,16 +17,12 @@ class StringEx4{
 		String month = num.substring(2,4);
 		String date = num.substring(4,6);
 		char genNum;
-		if (num.indexOf('-')>0){
-			genNum = num.charAt(num.indexOf('-')+1);
-		} else{
-			genNum = num.charAt(6);
-		}	
-		if (genNum=='1'||genNum=='2'){
-			year = "19" + year;
-		} else{
-			year = "20" + year;
-		}
+		int n = 7;
+		if (num.length() == 13) n=6;
+		genNum = num.charAt(n);
+		int y = 19;
+		if (genNum=='3'||genNum=='4') y = 20;
+		year = y + year;
 		System.out.println(year + "-" + month + "-" + date);
 		
 	}
@@ -34,13 +30,13 @@ class StringEx4{
 	public static void showGender(String num){
 		//주민등록번호에서 성별구분자를 추출하여 성별 출력(남자 or 여자)
 		char genNum;
-		if (num.indexOf('-')>0){ //num.length 쓰는 방법도 있음
+		if (num.indexOf('-')>0){ //num.length 쓰는 방법도 있음. int n = 7; if (num.length() == 13) n = 6;
 			genNum = num.charAt(num.indexOf('-')+1);
 		} else{
 			genNum = num.charAt(6);
 		}
 		
-		if (genNum=='1'||genNum=='3'){
+		if (genNum%2==1){
 			System.out.println("남자");
 		} else{
 			System.out.println("여자");

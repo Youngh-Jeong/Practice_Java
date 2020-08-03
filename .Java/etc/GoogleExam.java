@@ -43,9 +43,9 @@ class GoogleExam{
 		int count3 = 0;
 		for (int i = 1;i<=1000 ;i++){
 			String str = i + "";
-			for (int j = 0;j <str.lengtg();j++){
+			for (int j = 0;j <str.length();j++){
 				char c = str.charAt(j);
-				if (c=='8') count++;
+				if (c=='8') count3++;
 			}
 		}
 		System.out.println("8의 개수 : " + count3);
@@ -54,12 +54,10 @@ class GoogleExam{
 		
 		int count4 = 0;
 		int num4 = 0;
-		boolean hasEight = false;
 		for (int i = 1;i<=1000;i++){
 			num4 = i;
-			while (num4 == 0){
+			while (num4 != 0){
 				if (num4%10 == 8){
-					hasEight = true;
 					count4 ++;
 					break;
 				}
@@ -68,5 +66,16 @@ class GoogleExam{
 		}
 
 		System.out.println("8의 개수 : " + count4);
+
+		//5. 8이 들어있는 숫자의 개수 (문자열 이용)
+
+		int count5 = 0;
+		for (int i = 1;i<=1000;i++){
+			String str = i + "";
+			if (str.indexOf("8")>=0){
+					count5++;
+			}
+		}
+		System.out.println("8의 개수 : " + count5);
 	}
 }
