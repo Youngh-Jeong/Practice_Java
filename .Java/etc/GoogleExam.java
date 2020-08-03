@@ -38,5 +38,35 @@ class GoogleExam{
 		System.out.println("8의 개수 : " + count2);
 
 
+		//3. 학원 방법
+
+		int count3 = 0;
+		for (int i = 1;i<=1000 ;i++){
+			String str = i + "";
+			for (int j = 0;j <str.lengtg();j++){
+				char c = str.charAt(j);
+				if (c=='8') count++;
+			}
+		}
+		System.out.println("8의 개수 : " + count3);
+
+		//4. 8이 들어있는 숫자의 개수를 구하여 출력
+		
+		int count4 = 0;
+		int num4 = 0;
+		boolean hasEight = false;
+		for (int i = 1;i<=1000;i++){
+			num4 = i;
+			while (num4 == 0){
+				if (num4%10 == 8){
+					hasEight = true;
+					count4 ++;
+					break;
+				}
+				num4 = num4/10;
+			}
+		}
+
+		System.out.println("8의 개수 : " + count4);
 	}
 }
