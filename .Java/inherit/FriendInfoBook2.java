@@ -11,6 +11,9 @@
  - UnivFriend : Friend 클래스를 상속받아 기본정보를 제외한 대학친구 전용 정보를 저장할 클래스
  - FriendHandler : 친구 정보를 이용해 작업을 처리하는 클래스
  - FriendInfoBook : 프로그램의 시작과 종료를 담당 (main()메소드가 있는 클래스)
+
+Friend클래스가 HighFriend와 UnivFriend의 상위클래스이므로 Friend클래스형으로 두 클래스를 묶을 수 있음
+두 클래스를 동일한 방식으로 제어할 수 있게 해줌
 */
 import java.util.*;
 
@@ -27,6 +30,8 @@ class Friend{
 		System.out.println("주소 : " + addr);
 	}
 	public void showBasicInfo(){}
+	// 하위클래스에서 오버라이딩하기 위해 선언된 메소드
+	public String getName(){return name;}
 }
 
 class HighFriend extends Friend{
@@ -39,6 +44,7 @@ class HighFriend extends Friend{
 	}
 	public void showData(){
 		super.showData();
+		// showData()메소드는 오버라이딩되어 있기 때문에 상위클래스의 원본 메소드를 호출하려면 super을 이용하여 호출하는 방법
 		System.out.println("직업 : " + work);
 	}
 	public void showBasicInfo(){
@@ -77,11 +83,12 @@ class FriendHandler{
 		numOfFriends = 0;
 		//friends배열에 추가할 데이터가 들어갈 인덱스 번호이자 현재 들어있는 데이터의 개수
 	}
-	private void addrFriendInfo(Friend fren){
+	private void addFriendInfo(Friend fren){
 	// 현재 클래스 내부에서만 사용해야 하는 메소드이므로 private으로 선언됨
 	// 친구정보를 담은 인스턴스를 friends배열에 저장하는 메소드
+	// 매개변수의 자료형을 Friend로 하여 HighFriend와 UnivFriend 모두 받을 수 있게 함
 		friends[numOfFriends] = fren;
-		// friends배열에 받아온 데이터르 ㄹ저장
+		// friends배열에 받아온 데이터를 저장
 		numOfFriends++;
 		// 다음에 넣을 데이터의 인덱스번호를 1 증가
 	}
@@ -97,10 +104,11 @@ class FriendHandler{
 
 		if (choice == 1){
 			System.out.print("직업 : "); work = sc.nextLine();
-			addrFriendInfo(new HighFriend(name, phone, addr, work));
+			addFriendInfo(new HighFriend(name, phone, addr, work));
+			// 입력받은 데이터를 이용하여 HighFriend의 인스턴스를 생성한 후 그 인스턴스를 매개변수로 하여 addFriendInfo()메소드를 호출
 		} else {
 			System.out.print("전공 : "); major = sc.nextLine();
-			addrFriendInfo(new HighFriend(name, phone, addr, major));
+			addFriendInfo(new HighFriend(name, phone, addr, major));
 		}
 		System.out.println("입력 완료\n");
 	}
@@ -108,27 +116,54 @@ class FriendHandler{
 		for (int i = 0;i < numOfFriends ;i++ ){
 			// 배열의 길이가 아닌 현재 들어있는 데이터 만큼만 루프를 돔
 			friends[i].showData();
+			// friends배열의 i 인덱스에 들어있는 인스턴스의 showData()메소드 실행
+			// friends배열이 Friend형이므로 Friend클래스의 showData()메소드가 실행되어야 하나 오버라이딩되어있기 때문에 하위클래스의 showData()메소드가 실행됨
 			System.out.println();
 		}
 	}
 	public void showBasicData() {
 		for (int i = 0;i < numOfFriends ;i++ ){
 			friends[i].showBasicInfo();
+			/*
+			shoBasicInfo()메소드가 오버라이딩이 아닐 경우
+			if (friends[i] insatnceof HighFriend){
+				((HighFriend)friends[i]).showBasicInfo();
+			} else if (friends[i] insatnceof UnivFriend){
+				((UnivFriend)friends[i]).showBasicInfo();
+			}
+			*/
 			System.out.println();
 		}
 	}
+
+	public void searchName(){
+		Scanner sc2 = new Scanner(System.in);
+		System.out.print("검색할 이름 : "); String name = sc2.nextLine();
+		boolean isNotFound = true;
+		for (int i = 0; i<numOfFriends;i++ ){
+			if (name.equals(friends[i].getName())){
+				// 받아온 perNum과 perArr배열에 들어있는 인스턴스의 number값을 같은지 비교하여 원하는 이름을 리턴
+				friends[i].showData();
+				isNotFound = false;
+				System.out.println();
+			}
+		}
+		if (isNotFound){System.out.print("검색 결과가 없습니다.");}
+	}
 }
 
-class FriendInfoBook{
+
+class FriendInfoBook2{
 	public static void main(String[] args){
 		FriendHandler handler = new FriendHandler(10);
-		while (true){//무한루프
+		while (true){//무한루프 : 반드시 빠져나올 조건이 있어야 함
 			System.out.println("*** 메뉴 선택 ***");
 			System.out.println("1. 고교 친구 저장");
 			System.out.println("2. 대학 친구 저장");
 			System.out.println("3. 전체 정보 출력");
 			System.out.println("4. 기본 정보 출력");
-			System.out.println("5. 프로그램 종료");
+			System.out.println("5. 친구정보 검색");
+			System.out.println("9. 프로그램 종료");
 			System.out.print("선택 >> ");
 
 			Scanner sc = new Scanner(System.in);
@@ -142,6 +177,8 @@ class FriendInfoBook{
 			case 4:
 				handler.showBasicData();			break;
 			case 5:
+				handler.searchName();			break;
+			case 9:
 				System.out.println("프로그램을 종료합니다.");
 				return;
 				//메소드 강제 종료로 현재는 main()메소드이므로 프로그램이 종료됨
