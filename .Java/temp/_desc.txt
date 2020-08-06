@@ -1,0 +1,73 @@
+예외(Exception)처리
+ - 컴파일 도중이 아닌 프로그램 실행시 예외적인 상황에서 발생하는 잘못된 동작을 의미
+ - 발생한 예외를 처리하는 방법으로 try-catch문을 이용할 수 있다.
+ - try-catch문
+try{
+	예외가 발생할 실행문
+} catch (발생할예외클래스){
+	처리구문
+} finally {
+	예외 발생 또는 return 등의 상황에 상관없이 언제나 동작되는 영역
+}
+
+ - catch문은 여러 개를 입력해도 됨 (여러 예외 상황이 발생할 경우)
+ - catch문을 여러 개 사용할 경우 적용 범위가 넓은 예외 클래스를 아래에 입력해야 함
+    Exception클래스를 사용하는 catch문은 무조건 가장 아래에 입력해야 함
+ - catch문에서 사용하는 메소드
+String	getMessage() : 예외상황에서 보여주는 메시지를 리턴
+ - 단, 메세지가 부실함
+ void	printStackTrace() : 예외상황이 발생한 경로를 차례대로 보여줌
+ 
+ -타 클래스의 메소드 호출 시 메소드 선언부에 'throws 예외클래스'형식으로 선언되어 있으면 해당 메소드 호출시 반드시 try-catch로 예외처리를 하면서 호출해야 함
+
+
+Wrapper 클래스
+ - 기본자료형(변수의 자료형) 데이터를 객체로 만들어 주는 클래스들
+    단, 자료형을 변형하지 않고 유지한 채로 객체로 생성함
+ - java.lang패키지에 있으면 대부분 기본자료형의 이름을 첫글자를 대문자로 바꾼 클래스명 사용
+    클래스 : Boolean, Byte, Character, Double, Float, Integer, Long, Short
+    각 자료형별 클래스의 생성자를 이용하여 인스턴스(객체) 생성
+ - 기본 자료형 데이터를 Wrapper클래스를 이용하여 객체로 생성하는 것을 '박싱(boxing)', 객체를 기본 자료형 데이터로 변경하는 것을 '언박싱(unboxing)'이라 함
+ - static int		 parseInt(String s)	: 문자열을 정수(int)로 변환하는 메소드
+    예) Integer.parseInt("123") -> 문자열 "123"이 정수 123으로 변경됨
+ - static Integer	 valueOf(String s)	: parseInt()와 비슷한 기능으로 Integer객체 생성
+
+
+BigInteger 클래스
+ - java.math 패키지에 있으며 long으로도 표현할 수 없는 아주 큰 정수를 표현하는 클래스
+ - 연산도 메소드를 이용하여 작업해야 함
+ - 생성자
+BigInteger(String val) : 표현하려는 정수를 무자열로 입력하여 BigInteger 인스턴스 생성
+ - 주요 메소드
+리턴		메소드명 및 설명
+BigInteger	abs() : 절대값
+BigInteger	add(BigInteger val) : BigInteger끼리의 덧셈
+BigInteger	divide(BigInteger val) : BigInteger끼리의 나눗셈(val이 나누는 수)
+int		intValue() : BigInteger의 값을 int형으로 변환하여 리턴
+long		longValue() : BigInteger의 값을 long형으로 변환하여 리턴
+BigInteger	multiply(BigInteger val) : BigInteger끼리의 곱셈
+BigInteger	negate() : BigInteger의 값을 음수로 변경
+BigInteger	pow(int exponent) : BigInteger의 값을 exponent만큼 거듭제곱 함
+BigInteger	subtract(BigInteger val) : BigInteger끼리의 뺄셈 (val을 뺌)
+
+BigDecimal 클래스
+ - java.math 패키지에 있으며 실수연산을 정확하게 해주는 클래스
+ - 연산은 메소드를 이용해서 해야 함
+ - 생성자
+BigDecimal(String val) : 문자열로 표현된 실수를 BigDecimal 인스턴스로 생성
+
+ - 주요 메소드
+BigDecimal	abs() : 절대값
+BigDecimal	add(BigDecimal augend) : BigDecimal끼리의 덧셈
+BigDecimal	divide(BigDecimal divisor) : 나눗셈(divisor가 나누는 수)
+int		intValue() : BigDecimal의 값을 int형으로 변환하여 리턴
+long		longValue() : BigDecimal의 값을 long형으로 변환하여 리턴
+BigDecimal	multiply(BigDecimal multiplicand) : BigDecimal 곱셈
+BigDecimal	negate() : BigDecimal의 값을 음수로 변경
+BigDecimal	plus() : BigDecimal의 값을 양수로 변경
+BigDecimal	pow(int n) : BigDecimal의 값을 n만큼 거듭제곱 함
+BigDecimal	substract(BigDecimal subtrahend) : 뺄셈 (subtrahend을 뺌)
+
+
+Random 클래스
+ - java.util 패키지에 있으며 0이상 1미만의 난수(무작위 수)를 발생시킴
