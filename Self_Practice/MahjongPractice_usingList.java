@@ -1,6 +1,6 @@
 import java.util.*;
 
-class MahjongPractice{
+class MahjongPractice_usingList{
 	public static void main(String[] args) {
 		
 
@@ -159,14 +159,22 @@ class Tile {
 	}
 	public boolean isStraight(Tile tile1, Tile tile2) {
 		boolean isSameColor = (color == tile1.getColor())&&(color == tile2.getColor())&&(color!=3);
-		ArrayList<Integer> numberLine = new ArrayList<>();
-		numberLine.add(number); numberLine.add(tile1.getNumber()); numberLine.add(tile2.getNumber());
-		Collections.sort(numberLine);
-		return (numberLine.get(0)+1 == numberLine.get(1))&&(numberLine.get(1)+1 == numberLine.get(2))&&isSameColor;
+		int[] numberLine = new int[3];
+		numberLine[0]=number; numberLine[1]=tile1.getNumber(); numberLine[2]=tile2.getNumber();
+		for (int i = 0;i<numberLine.length;i++) { //순서대로 나열
+			for (int j = i+1; j<numberLine.length;j++) {
+				if (numberLine[i]>numberLine[j]) {
+					int tmp = numberLine[i];
+					numberLine[i] = numberLine[j];
+					numberLine[j] = tmp;
+				}
+			}
+		}
+		return (numberLine[0]+1 == numberLine[1])&&(numberLine[1]+1 == numberLine[2])&&isSameColor;
 		
 	}
 	public boolean isBody(Tile tile1, Tile tile2) {
-		return is3Pair(tile1, tile2)||isStraight(tile1, tile2);
+		return is3Pair(tile1, tile2)&&isStraight(tile1, tile2);
 	}
 	public boolean isSameTile(Tile tile1) {
 		return (number == tile1.getNumber())&&(color == tile1.getColor())&&(ith == tile1.getOrder());
@@ -335,6 +343,7 @@ class Player{
 		if (manMod==1||sakMod==1||tongMod==1||zaMod==1||(manMod*sakMod*tongMod*zaMod)%3==1){
 			return false;
 		}
+		System.out.println("가능한 형태");
 
 		/*int headColor;
 
@@ -348,12 +357,12 @@ class Player{
 		za = sortColor(za);
 		int bodyCount = 0;
 
-		ArrayList<Tile> tmpMan = man; // 만수 체크 (몸통먼저)
+		ArrayList<Tile> tmpMan = man; // 만수 체크
 		System.out.println("tmpMan : " + tmpMan.size());
 		while (!tmpMan.isEmpty()){
 			if (tmpMan.size()==2){ // 머리가 있는 색이면
 				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderMan1: 
+				headfinderMan: 
 				for (int i = 0; i<tmpMan.size();i++){ 
 					for (int j = i+1; j<tmpMan.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
 						if ((tmpMan.get(i)).isHead(tmpMan.get(j))){ // i, j가 머리면
@@ -361,14 +370,12 @@ class Player{
 						tmpMan.remove(i); tmpMan.remove(j-1); //tmp에서 제거
 						existHead = true; // 머리 찾음
 						System.out.println("머리가 만수에 있음");
-						break headfinderMan1; // 탈출
+						break headfinderMan; // 탈출
 						}
 					}
 				}
 				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					tmpMan = man;
-					bodyCount=0;
-					break;
+					return false;
 				}
 			} else{
 
@@ -377,7 +384,7 @@ class Player{
 					break;
 				}
 				boolean existBody = false;
-				bodyfinderMan1:
+				bodyfinderMan:
 				for (int i = 0;i<tmpMan.size() ;i++ ){
 					for (int j = i+1;j<tmpMan.size() ;j++){
 						for (int k = j+1;k<tmpMan.size() ;k++){ //남은 것 중 3개를 비교해서
@@ -391,97 +398,38 @@ class Player{
 								}
 								bodyCount++;
 								existBody = true;
-								break bodyfinderMan1;
+								break bodyfinderMan;
 							}
 						}
 					}
 				}
-				System.out.println("existBody : " + existBody);
 				if (!existBody){ // 전부 찾았을 때, 몸통을 찾지 못했으면 false
-				System.out.println("existBody 에서 return");
 				return false;
 				}
 			}
 		}
-
-		System.out.println("tmpMan : " + tmpMan.size());
-		// 예외 확인 위한 역으로 검사 (머리먼저)
-		while (!tmpMan.isEmpty()){
-			if (tmpMan.size()%3==2){ // 머리가 있는 색이면
-				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderMan2: 
-				for (int i = 0; i<tmpMan.size();i++){ 
-					for (int j = i+1; j<tmpMan.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
-						if ((tmpMan.get(i)).isHead(tmpMan.get(j))){ // i, j가 머리면
-						head.add(tmpMan.get(i));	head.add(tmpMan.get(j)); //head에 추가
-						tmpMan.remove(i); tmpMan.remove(j-1); //tmp에서 제거
-						existHead = true; // 머리 찾음
-						System.out.println("머리가 만수에 있음");
-						break headfinderMan2; // 탈출
-						}
-					}
-				}
-				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					System.out.println("existHead 에서 return");
-					return false;
-				}
-			} 
-
-			// 3의배수 개에서 몸통 찾기
-			if (tmpMan.isEmpty()){ // 0개이면 탈출
-				break;
-			}
-			boolean existBody = false;
-			bodyfinderMan2:
-			for (int i = 0;i<tmpMan.size() ;i++ ){
-				for (int j = i+1;j<tmpMan.size() ;j++){
-					for (int k = j+1;k<tmpMan.size() ;k++){ //남은 것 중 3개를 비교해서
-						if ((tmpMan.get(i)).isBody(tmpMan.get(j), tmpMan.get(k))){ // 몸통이 만들어지면
-							switch (bodyCount){ // 몸통이 몇갠지에 따라 body에 추가하고 tmp에서 제거
-							case 0: body1.add(tmpMan.get(i)); body1.add(tmpMan.get(j)); body1.add(tmpMan.get(k)); tmpMan.remove(i); tmpMan.remove(j-1); tmpMan.remove(k-2); break;
-							case 1: body2.add(tmpMan.get(i)); body2.add(tmpMan.get(j)); body2.add(tmpMan.get(k)); tmpMan.remove(i); tmpMan.remove(j-1); tmpMan.remove(k-2); break;
-							case 2: body3.add(tmpMan.get(i)); body3.add(tmpMan.get(j)); body3.add(tmpMan.get(k)); tmpMan.remove(i); tmpMan.remove(j-1); tmpMan.remove(k-2); break;
-							case 3: body4.add(tmpMan.get(i)); body4.add(tmpMan.get(j)); body4.add(tmpMan.get(k)); tmpMan.remove(i); tmpMan.remove(j-1); tmpMan.remove(k-2); break;
-							default: System.out.println("에러: 몸통-bodyCount");
-							}
-							bodyCount++;
-							existBody = true;
-							break bodyfinderMan2;
-						}
-					}
-				}
-			}
-			if (!existBody){ // 전부 찾았을 때, 몸통을 찾지 못했으면 false
-				System.out.println("2번째 existBody 에서 return");
-			return false;
-			}
-			
-		}
-
 		System.out.println("tmpMan : " + tmpMan.size());
 		System.out.println("head : " + head.size());
 
-		int tmpBody = bodyCount;
+
 		ArrayList<Tile> tmpSak = sak; // 삭수 체크
 		System.out.println("tmpSak : " + tmpSak.size());
 		while (!tmpSak.isEmpty()){
 			if (tmpSak.size()==2){ // 머리가 있는 색이면
 				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderSak1: 
+				headfinderSak: 
 				for (int i = 0; i<tmpSak.size();i++){ 
 					for (int j = i+1; j<tmpSak.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
 						if ((tmpSak.get(i)).isHead(tmpSak.get(j))){ // i, j가 머리면
 						head.add(tmpSak.get(i));	head.add(tmpSak.get(j)); //head에 추가
 						tmpSak.remove(i); tmpSak.remove(j-1); //tmp에서 제거
 						existHead = true; // 머리 찾음
-						break headfinderSak1; // 탈출
+						break headfinderSak; // 탈출
 						}
 					}
 				}
 				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					tmpSak = sak;
-					bodyCount=tmpBody;
-					break;
+					return false;
 				}
 			} else{
 				// 3의배수 개에서 몸통 찾기
@@ -489,7 +437,7 @@ class Player{
 					break;
 				}
 				boolean existBody = false;
-				bodyfinderSak1:
+				bodyfinderSak:
 				for (int i = 0;i<tmpSak.size() ;i++ ){
 					for (int j = i+1;j<tmpSak.size() ;j++){
 						for (int k = j+1;k<tmpSak.size() ;k++){ //남은 것 중 3개를 비교해서
@@ -504,7 +452,7 @@ class Player{
 								bodyCount++;
 								existBody = true;
 								System.out.println("머리가 삭수에 있음");
-								break bodyfinderSak1;
+								break bodyfinderSak;
 							}
 						}
 					}
@@ -514,65 +462,15 @@ class Player{
 				}
 			}
 		}
-		// 머리부터
 		System.out.println("tmpSak : " + tmpSak.size());
-		while (!tmpSak.isEmpty()){
-			if (tmpSak.size()%3==2){ // 머리가 있는 색이면
-				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderSak2: 
-				for (int i = 0; i<tmpSak.size();i++){ 
-					for (int j = i+1; j<tmpSak.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
-						if ((tmpSak.get(i)).isHead(tmpSak.get(j))){ // i, j가 머리면
-						head.add(tmpSak.get(i));	head.add(tmpSak.get(j)); //head에 추가
-						tmpSak.remove(i); tmpSak.remove(j-1); //tmp에서 제거
-						existHead = true; // 머리 찾음
-						break headfinderSak2; // 탈출
-						}
-					}
-				}
-				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					return false;
-				}
-			} 
-			// 3의배수 개에서 몸통 찾기
-			if (tmpSak.isEmpty()){ // 0개이면 탈출
-				break;
-			}
-			boolean existBody = false;
-			bodyfinderSak2:
-			for (int i = 0;i<tmpSak.size() ;i++ ){
-				for (int j = i+1;j<tmpSak.size() ;j++){
-					for (int k = j+1;k<tmpSak.size() ;k++){ //남은 것 중 3개를 비교해서
-						if ((tmpSak.get(i)).isBody(tmpSak.get(j), tmpSak.get(k))){ // 몸통이 만들어지면
-							switch (bodyCount){ // 몸통이 몇갠지에 따라 body에 추가하고 tmp에서 제거
-							case 0: body1.add(tmpSak.get(i)); body1.add(tmpSak.get(j)); body1.add(tmpSak.get(k)); tmpSak.remove(i); tmpSak.remove(j-1); tmpSak.remove(k-2); break;
-							case 1: body2.add(tmpSak.get(i)); body2.add(tmpSak.get(j)); body2.add(tmpSak.get(k)); tmpSak.remove(i); tmpSak.remove(j-1); tmpSak.remove(k-2); break;
-							case 2: body3.add(tmpSak.get(i)); body3.add(tmpSak.get(j)); body3.add(tmpSak.get(k)); tmpSak.remove(i); tmpSak.remove(j-1); tmpSak.remove(k-2); break;
-							case 3: body4.add(tmpSak.get(i)); body4.add(tmpSak.get(j)); body4.add(tmpSak.get(k)); tmpSak.remove(i); tmpSak.remove(j-1); tmpSak.remove(k-2); break;
-							default: System.out.println("에러: 몸통-bodyCount");
-							}
-							bodyCount++;
-							existBody = true;
-							System.out.println("머리가 삭수에 있음");
-							break bodyfinderSak2;
-						}
-					}
-				}
-			}
-			if (!existBody){ // 전부 찾았을 때, 몸통을 찾지 못했으면 false
-				return false;
-			}
-		
-		}
+		System.out.println("head : " + head.size());
 
-
-		tmpBody = bodyCount;
 		ArrayList<Tile> tmpTong = tong; // 통수 체크
 		while (!tmpTong.isEmpty()){
 			System.out.println("tmpTong.get(i) : " + (tmpTong.get(0)).show());
 			if (tmpTong.size()==2){ // 머리가 있는 색이면
 				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderTong1: 
+				headfinderTong: 
 				for (int i = 0; i<tmpTong.size();i++){ 
 					for (int j = i+1; j<tmpTong.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
 						if ((tmpTong.get(i)).isHead(tmpTong.get(j))){ // i, j가 머리면
@@ -580,14 +478,12 @@ class Player{
 						tmpTong.remove(i); tmpTong.remove(j-1); //tmp에서 제거
 						existHead = true; // 머리 찾음
 						System.out.println("머리가 통수에 있음");
-						break headfinderTong1; // 탈출
+						break headfinderTong; // 탈출
 						}
 					}
 				}
 				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					tmpTong = tong;
-					bodyCount=tmpBody;
-					break;
+					return false;
 				}
 			} else {
 				// 3의배수 개에서 몸통 찾기
@@ -595,7 +491,7 @@ class Player{
 					break;
 				}
 				boolean existBody = false;
-				bodyfinderTong1:
+				bodyfinderTong:
 				for (int i = 0;i<tmpTong.size() ;i++ ){
 					for (int j = i+1;j<tmpTong.size() ;j++){
 						for (int k = j+1;k<tmpTong.size() ;k++){ //남은 것 중 3개를 비교해서
@@ -609,7 +505,7 @@ class Player{
 								}
 								bodyCount++;
 								existBody = true;
-								break bodyfinderTong1;
+								break bodyfinderTong;
 							}
 						}
 					}
@@ -619,65 +515,15 @@ class Player{
 				}
 			}
 		}
-
-		while (!tmpTong.isEmpty()){
-			System.out.println("tmpTong.get(i) : " + (tmpTong.get(0)).show());
-			if (tmpTong.size()%3==2){ // 머리가 있는 색이면
-				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderTong2: 
-				for (int i = 0; i<tmpTong.size();i++){ 
-					for (int j = i+1; j<tmpTong.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
-						if ((tmpTong.get(i)).isHead(tmpTong.get(j))){ // i, j가 머리면
-						head.add(tmpTong.get(i));	head.add(tmpTong.get(j)); //head에 추가
-						tmpTong.remove(i); tmpTong.remove(j-1); //tmp에서 제거
-						existHead = true; // 머리 찾음
-						System.out.println("머리가 통수에 있음");
-						break headfinderTong2; // 탈출
-						}
-					}
-				}
-				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					return false;
-				}
-			} 
-			// 3의배수 개에서 몸통 찾기
-			if (tmpTong.isEmpty()){ // 0개이면 탈출
-				break;
-			}
-			boolean existBody = false;
-			bodyfinderTong1:
-			for (int i = 0;i<tmpTong.size() ;i++ ){
-				for (int j = i+1;j<tmpTong.size() ;j++){
-					for (int k = j+1;k<tmpTong.size() ;k++){ //남은 것 중 3개를 비교해서
-						if ((tmpTong.get(i)).isBody(tmpTong.get(j), tmpTong.get(k))){ // 몸통이 만들어지면
-							switch (bodyCount){ // 몸통이 몇갠지에 따라 body에 추가하고 tmp에서 제거
-							case 0: body1.add(tmpTong.get(i)); body1.add(tmpTong.get(j)); body1.add(tmpTong.get(k)); tmpTong.remove(i); tmpTong.remove(j-1); tmpTong.remove(k-2); break;
-							case 1: body2.add(tmpTong.get(i)); body2.add(tmpTong.get(j)); body2.add(tmpTong.get(k)); tmpTong.remove(i); tmpTong.remove(j-1); tmpTong.remove(k-2); break;
-							case 2: body3.add(tmpTong.get(i)); body3.add(tmpTong.get(j)); body3.add(tmpTong.get(k)); tmpTong.remove(i); tmpTong.remove(j-1); tmpTong.remove(k-2); break;
-							case 3: body4.add(tmpTong.get(i)); body4.add(tmpTong.get(j)); body4.add(tmpTong.get(k)); tmpTong.remove(i); tmpTong.remove(j-1); tmpTong.remove(k-2); break;
-							default: System.out.println("에러: 몸통-bodyCount");
-							}
-							bodyCount++;
-							existBody = true;
-							break bodyfinderTong1;
-						}
-					}
-				}
-			}
-			if (!existBody){ // 전부 찾았을 때, 몸통을 찾지 못했으면 false
-				return false;
-			}
-		
-		}
+		System.out.println("tmpTong : " + tmpTong.size());
+		System.out.println("head : " + head.size());
 
 
-
-		tmpBody = bodyCount;
 		ArrayList<Tile> tmpZa = za; // 자패 체크
 		while (!tmpZa.isEmpty()){
 			if (tmpZa.size()==2){ // 머리가 있는 색이면
 				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderZa1: 
+				headfinderZa: 
 				for (int i = 0; i<tmpZa.size();i++){ 
 					for (int j = i+1; j<tmpZa.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
 						if ((tmpZa.get(i)).isHead(tmpZa.get(j))){ // i, j가 머리면
@@ -685,14 +531,12 @@ class Player{
 						tmpZa.remove(i); tmpZa.remove(j-1); //tmp에서 제거
 						existHead = true; // 머리 찾음
 						System.out.println("머리가 자패에 있음");
-						break headfinderZa1; // 탈출
+						break headfinderZa; // 탈출
 						}
 					}
 				}
 				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					tmpZa = za;
-					bodyCount=tmpBody;
-					break;
+					return false;
 				}
 			} else{
 			// 3의배수 개에서 몸통 찾기
@@ -700,7 +544,7 @@ class Player{
 					break;
 				}
 				boolean existBody = false;
-				bodyfinderZa1:
+				bodyfinderZa:
 				for (int i = 0;i<tmpZa.size() ;i++ ){
 					for (int j = i+1;j<tmpZa.size() ;j++){
 						for (int k = j+1;k<tmpZa.size() ;k++){ //남은 것 중 3개를 비교해서
@@ -714,7 +558,7 @@ class Player{
 								}
 								bodyCount++;
 								existBody = true;
-								break bodyfinderZa1;
+								break bodyfinderZa;
 							}
 						}
 					}
@@ -724,56 +568,6 @@ class Player{
 				}
 			}
 		}
-
-		while (!tmpZa.isEmpty()){
-			if (tmpZa.size()%3==2){ // 머리가 있는 색이면
-				boolean existHead = false; // 머리를 찾았는지 체크
-				headfinderZa1: 
-				for (int i = 0; i<tmpZa.size();i++){ 
-					for (int j = i+1; j<tmpZa.size() ;j++ ){ // 1쌍씩 비교하기 위한 이중for문
-						if ((tmpZa.get(i)).isHead(tmpZa.get(j))){ // i, j가 머리면
-						head.add(tmpZa.get(i));	head.add(tmpZa.get(j)); //head에 추가
-						tmpZa.remove(i); tmpZa.remove(j-1); //tmp에서 제거
-						existHead = true; // 머리 찾음
-						System.out.println("머리가 자패에 있음");
-						break headfinderZa1; // 탈출
-						}
-					}
-				}
-				if (!existHead)	{ // 전부 찾았을 때,  머리를 찾지 못했으면 false
-					return false;
-				}
-			} 
-			// 3의배수 개에서 몸통 찾기
-				if (tmpZa.isEmpty()){ // 0개이면 탈출
-					break;
-				}
-				boolean existBody = false;
-				bodyfinderZa1:
-				for (int i = 0;i<tmpZa.size() ;i++ ){
-					for (int j = i+1;j<tmpZa.size() ;j++){
-						for (int k = j+1;k<tmpZa.size() ;k++){ //남은 것 중 3개를 비교해서
-							if ((tmpZa.get(i)).isBody(tmpZa.get(j), tmpZa.get(k))){ // 몸통이 만들어지면
-								switch (bodyCount){ // 몸통이 몇갠지에 따라 body에 추가하고 tmp에서 제거
-								case 0: body1.add(tmpZa.get(i)); body1.add(tmpZa.get(j)); body1.add(tmpZa.get(k)); tmpZa.remove(i); tmpZa.remove(j-1); tmpZa.remove(k-2); break;
-								case 1: body2.add(tmpZa.get(i)); body2.add(tmpZa.get(j)); body2.add(tmpZa.get(k)); tmpZa.remove(i); tmpZa.remove(j-1); tmpZa.remove(k-2); break;
-								case 2: body3.add(tmpZa.get(i)); body3.add(tmpZa.get(j)); body3.add(tmpZa.get(k)); tmpZa.remove(i); tmpZa.remove(j-1); tmpZa.remove(k-2); break;
-								case 3: body4.add(tmpZa.get(i)); body4.add(tmpZa.get(j)); body4.add(tmpZa.get(k)); tmpZa.remove(i); tmpZa.remove(j-1); tmpZa.remove(k-2); break;
-								default: System.out.println("에러: 몸통-bodyCount");
-								}
-								bodyCount++;
-								existBody = true;
-								break bodyfinderZa1;
-							}
-						}
-					}
-				}
-				if (!existBody){ // 전부 찾았을 때, 몸통을 찾지 못했으면 false
-					return false;
-				}
-			}
-
-
 		System.out.println("tmpZa : " + tmpZa.size());
 		System.out.println("head : " + head.size());
 		System.out.println("머리 : " + (head.get(0)).show() + (head.get(1)).show());

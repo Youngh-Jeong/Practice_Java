@@ -26,7 +26,7 @@ boolean		add(E e) : 지정된 객체를 저장
 boolean		addAll(Collection<? extends E> c) : E를 상속받는 자료형을 가진 Collection의 전부를 저장
 void		clear() : 모든 요소들을 삭제
 boolean		contains(Object o) : 지정한 객체(o)가 컬렉션에 포함되어 있는지 여부를 리턴
-boolean		containsAll(Collection<?> c) : 지정한 컬렉셔니 포함되어 있는지 여부
+boolean		containsAll(Collection<?> c) : 지정한 컬렉션이 포함되어 있는지 여부
 boolean		equals(Object o) : 같은 컬렉션인지 여부
 boolean		isEmpty() : 컬렉션이 비어 있는지 여부
 Iterator<E>	iterator() : 컬렉션의 Iterator를 리턴
@@ -64,3 +64,66 @@ ArrayList() : 기본 크기 10인 ArrayList 생성
 ArrayList(Collection<? extends E> c) : 지정된 컬렉션을 이용하여 ArrayList 생성
 ArrayList(int initialCapacity) : 지정한 초기용량을 가지는 ArrayList 생성
  : Collection을 상속받는 모든 List와 Set의 컬렉션들이 ArrayList로 생성될 수 있다는 의미
+
+ - 주요 메소드 : Collection과 List에 있는 메소드는 제외
+리턴		메소드명 및 설명
+void		ensureCapacity(int minCapacity) : minCapacity를 최소 용량으로 지정
+void		trimToSize() : 용량을 크기에 맞게 줄여줌
+
+LinkedList<E> 클래스
+ - ArrayList 다음으로 많이 사용되는 List 중 하나
+ - ArrayList에 비해 데이터의 추가 및 삭제가 빠름 : 변화가 많은 컬렉션일 경우 ArrayList보다 효율적
+    데이터를 읽어 들이는 시간(접근 시간)이 느리며, 데이터가 많을수록 접근성은 더 떨어짐
+    순차적인 추가/삭제는 오히려 ArrayList가 더 빠름
+    데이터의 개수가 변하지 않으면 ArrayList가 더 효율적이고, 변화가 많으면 LinkedList가 효율적
+ - 주요 메소드 : Collection과 List에 있는 메소드는 제외 
+ -Deque<E>인터페이스의 메소드
+리턴		메소드명 및 설명
+void		addFirst(E e) : 리스트의 첫 부분에 객체 추가
+void		addLast(E e) : 리스트의 끝 부분에 객체 추가
+Iterator<E>	descendingIterator() : 내림차순으로 정렬하기 위한 iterator를 리턴
+E		getFirst() : 첫번째 요소를 리턴
+E		getLast() : 마지막 요소를 리턴 
+boolean		offerFirst(E e) : 리스트의 맨 앞에 지정된 객체를 추가
+boolean		offerLast(E e) : 리스트의 맨 끝에 지정된 객체를 추가
+E		peekFirst() : 리스트의 첫번째 요소를 리턴 - peek()와 동일
+E		peekLast() : 리스트의 마지막 요소를 리턴
+E		pollFirst() : poll()과 동일
+E		pollLast() : 리스트의 마지막 요소를 리턴 - 리스트에서 제거
+E		pop() : 리스트의 첫번째 요소를 삭제
+void		push(E e) : addFirst와 동일
+E		removeFirst() : 리스트의 첫번째 요소를 삭제
+E		removeLast() : 리스트의 마지막 요소를 삭제
+boolean		removeFirstOccurrence(Object o) : 리스트에서 지정한 객체와 동일한 객체들 중 첫번째를 삭제
+boolean		removeLastOccurence(Object o) : 리스트에서 지정한 객체와 동일한 객체들 중 마지막을 삭제
+
+
+ - Queue<E>인터페이스의 메소드
+리턴		메소드명 및 설명
+E		element() : 리스트의 첫번째 요소를 리턴
+boolean		offer(E e) : 리스트의 끝에 지정된 객체를 추가
+E		peek() : 리스트의 첫번째 요소를 리턴 - element와 동일
+E		poll() : 리스트의 첫번째 요소를 리턴 - 리스트에서 제거
+
+
+Stack<E> 클래스
+ - Vector를 상속받은 클래스로 처음 저장한 객체가 가장 나중에 나오는 구조로 되어 있다.
+ - FILO(First In Last Out) 또는 LIFO(Last In First Out)
+ - 생성자
+Stack() : 빈 스택 생성
+ - 주요 메소드
+리턴		메소드 명 및 설명
+boolean		empty() : 비어있는지 여부를 리턴
+E		peek() : 맨 위에 있는 데이터 리턴, 삭제는 안 함(없을 때 EmptyStackException 발생)
+E		pop() : 맨 위에 있는 데이터 리턴, 리턴 후 삭제 (없을 때 EmptyStackException 발생)
+E		push(E item) : 스택에 지정한 객체를 저장
+int		search(Object o) : 지정된 객체의 위치를 리턴(0이 아닌 1부터 시작), 못 찾으면 -1 리턴
+
+Queue<E> 인터페이스
+ - Collection인터페이스를 상속받는 인터페이스로 먼저 저장된 객체가 먼저 나오는 구조
+ - FIFO(First In First Out) 또는 LILO(Last In Last Out)
+ - Queue를 구현한 클래스인 LinkedList를 이용하여 작업하는 경우가 많다.
+ - 생성자와 메소드는 LinkedList의 것을 사용하면 됨(Collection인터페이스의 메소드 포함)
+
+
+
