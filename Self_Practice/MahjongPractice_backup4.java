@@ -399,7 +399,8 @@ class Player{
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
-			if (tmpMan.size()%3==2){ // 머리가 있는 색이면 
+			if (tmpMan.size()%3==0)	{return false;} // 몸통만 있는 색에서 몸통에 포함이 안되면 완성이 안된 것이다.
+			if (tmpMan.size()%3==2){ // 그 요소는 몸통은 안되는데 머리일 수도 있다면
 				if (hasHead = true){ // 머리가 있는데 여기로 넘어오면 오류임 (체크용)
 					System.out.println("오류 - 머리가 2개인 케이스가 나옴");
 					return false;
@@ -413,7 +414,18 @@ class Player{
 					return false; // 실패
 				}
 			}
-			tmpCount1++;
+			// 1번 패를 기준으로 삼을 때, k++ 사용 여부
+
+			tmpCount1++ //몇번 돌았는지 셈
+
+			if (tmpCount1 == (man.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
+				// tmp값 복원하기
+				// tmpCount1=0
+				// k++ (다음자리부터 알고리즘을 시작함)
+			}
+			if (k>man.size()-2){//가능한 k를 전부 돌려보았다면
+				return false;
+			}
 			System.out.println("만수루프");
 		} //만수가 0개가 되면 탈출함
 

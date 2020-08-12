@@ -1,0 +1,25 @@
+날짜 및 시간
+ - java에서는 jdk1.0에서 Date객체를 이용하여 날짜를 표현했으나 기능이 너무 부족하여 jdk1.1에서 Calendear객체를 새롭게 제공하게 됨
+ - 그 후 jdk1.8에서 time패키지로 다시 한 번 새로운 형태로 날짜 및 시간을 표현하게 됨
+
+Calendar 클래스
+ - java.util 패키지에 있음
+ - 기본적으로 Calendar클래스는 abstract클래스이므로 인스턴스 생성시 생성자를 이용하지 않고, getInstance()메소드를 이용하여 인스턴스를 생성하게 됨
+ - 기존의 날짜표현 클래스인 Data 클래스의 인스턴스로 변환이 가능
+ - 주요 메소드
+리턴		메소드명 및 설명
+void		add(int field, int amount) : field에 해당하는 값에 amount를 더한 날짜
+ - amount에 음수를 넣으면 이전 날짜 및 시간을 구할 수 있음
+int		get(int field) : 주어진 field(년월일시분초 등)에 해당하는 값을 리턴
+Calendar	getInstance() : abstract 클래스인 Calendar의 인스턴스를 생성
+ - 기본적으로 현 시스템의 오늘 날짜 및 현재 시각을 가지고 있음
+long		getTimeInMillis() : 지정된 날짜 및 시간을 밀리초 단위로 환산하여 리턴
+void		roll(int field, int amount) : field에 해당하는 값에 amount를 더한 날짜
+ - add()와 비슷하나 지정된 field값만을 더함(다른 field에는 영향을 미치지 않음)
+
+
+set()		특정 날짜 및 시간을 지정하는 메소드
+void		set(int field, int value) : 지정된 field의 값을 value로 변경 
+void		set(int year, int month, int date) : 지정한 년월일로 날짜 변경
+void		set(int year, int month, int date, int hourOfDay, int minute) : 지정한 년월일시분으로 날짜 및 시간 변경(시는 24시간제로 입력)
+void		set(int year, int month, int date, int hourOfDay, int minute, int second) : 지정한 년월일시분초로 날짜 및 시간 변경 (시는 24시간제로 입력)

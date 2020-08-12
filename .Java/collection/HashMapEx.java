@@ -18,15 +18,16 @@ class HashMapEx{
 			String pwd = sc.nextLine().trim();
 			System.out.println();
 
-			if (!map.containsKey(id)){
-			System.out.println("없는 아이디 입니다.");
-			continue;
+			if (!map.containsKey(id)){ // map에 id와 동일한 key가 있으면
+				System.out.println("없는 아이디 입니다.");
+				continue;
 			}
 			if (!(map.get(id)).equals(pwd)){
 				System.out.println("틀린 비밀번호 입니다.");
 				continue;
 			}
 			System.out.println("로그인에 성공하였습니다.");
+			break;
 		}
 	}
 }
