@@ -1,6 +1,6 @@
 import java.util.*;
 
-class MahjongPractice{
+class MahjongPractice_backup4{
 	public static void main(String[] args) {
 		
 
@@ -328,8 +328,8 @@ class Player{
 	}
 
 	public boolean is3PairInTmp(ArrayList<Tile> tmp, int i){ // isBasicForm의 형태에서 i번째 패가 커쯔가 있는지 검사 (true면 i, i+1, i+2rk 커쯔)
-		if (i+2>=tmp.size()){ return false;}
-		if (i<3){return false;}
+		if (i+2>=tmp.size()){ return false;} // 비교할 타일이 3개미만
+		if (tmp.size()<3){return false;} // 남은 타일이 3개 미만
 		if ((tmp.get(i)).is3Pair(tmp.get(i+1), tmp.get(i+2))){
 			return true;
 		}
@@ -377,37 +377,44 @@ class Player{
 
 		//만수 체크 (슌쯔-커쯔-if머리)
 		ArrayList<Tile> tmpMan = man; //임시카피
-		int tmpCount1 = 0; // 디버그용
-		while (!tmpMan.isEmpty()||tmpCount1==5){ // 다 찾아서 텐파이형태를 만족할 때 까지
+		//확정 전까진 임시값으로 사용
+		ArrayList<Tile> tmpHead = new ArrayList<>();
+		ArrayList<Tile> tmpBody1 = new ArrayList<>();
+		ArrayList<Tile> tmpBody2 = new ArrayList<>();
+		ArrayList<Tile> tmpBody3 = new ArrayList<>();
+		ArrayList<Tile> tmpBody4 = new ArrayList<>();
+
+		int tmpCount1 = 0; // 실패판단용
+		while (!tmpMan.isEmpty()){ // 다 찾아서 텐파이형태를 만족할 때 까지
 			int k = 0; // 첫번째 타일을 대상으로 함. 가능한 상태는 1) 쓸모없음 2) 슌쯔로 사용됨 3) 커쯔로 사용됨 4) 머리로 사용됨  딱히 필요없는데 하다보니 셋팅함
 			int t = isStraingtInTmp(tmpMan, k);//슌쯔인지 확인
 			if (t!=-1){ // 슌쯔가 되면, 2)케이스
 				switch (bodyCount){ // 만들어진 몸통 개수에 맞게 넣고 정렬 후 지움
-				case 0: body1.add(tmpMan.remove(t+1)); body1.add(tmpMan.remove(t));body1.add(tmpMan.remove(k)); body1 = sortColor(body1); bodyCount++;continue;
-				case 1: body2.add(tmpMan.remove(t+1)); body2.add(tmpMan.remove(t));body2.add(tmpMan.remove(k)); body2 = sortColor(body2); bodyCount++;continue;
-				case 2: body3.add(tmpMan.remove(t+1)); body3.add(tmpMan.remove(t));body3.add(tmpMan.remove(k)); body3 = sortColor(body3); bodyCount++;continue;
+				case 0: tmpBody1.add(tmpMan.remove(t+1)); tmpBody1.add(tmpMan.remove(t));tmpBody1.add(tmpMan.remove(k)); tmpBody1 = sortColor(tmpBody1); bodyCount++;continue;
+				case 1: tmpBody2.add(tmpMan.remove(t+1)); tmpBody2.add(tmpMan.remove(t));tmpBody2.add(tmpMan.remove(k)); tmpBody2 = sortColor(tmpBody2); bodyCount++;continue;
+				case 2: tmpBody3.add(tmpMan.remove(t+1)); tmpBody3.add(tmpMan.remove(t));tmpBody3.add(tmpMan.remove(k)); tmpBody3 = sortColor(tmpBody3); bodyCount++;continue;
 				case 3: body4.add(tmpMan.remove(t+1)); body4.add(tmpMan.remove(t));body4.add(tmpMan.remove(k)); body4 = sortColor(body4); bodyCount++;continue;
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
 			if (is3PairInTmp(tmpMan,k)){ // 커쯔가 되면, 3)케이스
 				switch (bodyCount){ // 만들어진 몸통 개수에 맞게 넣고 정렬 후 지움
-				case 0: body1.add(tmpMan.remove(k+2)); body1.add(tmpMan.remove(k+1));body1.add(tmpMan.remove(k)); body1 = sortColor(body1); bodyCount++;continue;
-				case 1: body2.add(tmpMan.remove(k+2)); body2.add(tmpMan.remove(k+1));body2.add(tmpMan.remove(k)); body2 = sortColor(body2); bodyCount++;continue;
-				case 2: body3.add(tmpMan.remove(k+2)); body3.add(tmpMan.remove(k+1));body3.add(tmpMan.remove(k)); body3 = sortColor(body3); bodyCount++;continue;
-				case 3: body4.add(tmpMan.remove(k+2)); body4.add(tmpMan.remove(k+1));body4.add(tmpMan.remove(k)); body4 = sortColor(body4); bodyCount++;continue;
+				case 0: tmpBody1.add(tmpMan.remove(k+2)); tmpBody1.add(tmpMan.remove(k+1));tmpBody1.add(tmpMan.remove(k)); tmpBody1 = sortColor(tmpBody1); bodyCount++;continue;
+				case 1: tmpBody2.add(tmpMan.remove(k+2)); tmpBody2.add(tmpMan.remove(k+1));tmpBody2.add(tmpMan.remove(k)); tmpBody2 = sortColor(tmpBody2); bodyCount++;continue;
+				case 2: tmpBody3.add(tmpMan.remove(k+2)); tmpBody3.add(tmpMan.remove(k+1));tmpBody3.add(tmpMan.remove(k)); tmpBody3 = sortColor(tmpBody3); bodyCount++;continue;
+				case 3: tmpBody4.add(tmpMan.remove(k+2)); tmpBody4.add(tmpMan.remove(k+1));tmpBody4.add(tmpMan.remove(k)); tmpBody4 = sortColor(tmpBody4); bodyCount++;continue;
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
 			if (tmpMan.size()%3==0)	{return false;} // 몸통만 있는 색에서 몸통에 포함이 안되면 완성이 안된 것이다.
 			if (tmpMan.size()%3==2){ // 그 요소는 몸통은 안되는데 머리일 수도 있다면
 				if (hasHead = true){ // 머리가 있는데 여기로 넘어오면 오류임 (체크용)
-					System.out.println("오류 - 머리가 2개인 케이스가 나옴");
+					System.out.println("오류 - 머리가 2개인 케이스가 나옴(만수)");
 					return false;
 				}
 					
 				if ((tmpMan.get(k)).isHead(tmpMan.get(k+1))){// 다음칸이 머리면 (정렬했으니 다음칸이여야됨) 4)케이스
-					head.add(tmpMan.remove(k+1)); head.add(tmpMan.remove(k));head=sortColor(head); // 머리로 옮김
+					tmpHead.add(tmpMan.remove(k+1)); tmpHead.add(tmpMan.remove(k));tmpHead=sortColor(tmpHead); // 머리로 옮김
 					hasHead = true; // 머리 있음체크
 					continue; // 돌아감 (머리를 찾았음. 무한루프이면 여기가 오류가능성)
 				} else {// 머리도 아니면, 1)이므로 
@@ -416,50 +423,52 @@ class Player{
 			}
 			// 1번 패를 기준으로 삼을 때, k++ 사용 여부
 
-			tmpCount1++ //몇번 돌았는지 셈
+			tmpCount1++; //몇번 돌았는지 셈
 
 			if (tmpCount1 == (man.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
-				// tmp값 복원하기
-				// tmpCount1=0
-				// k++ (다음자리부터 알고리즘을 시작함)
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpCount1 = 0;// tmpCount1=0
+				k++;// k++ (다음자리부터 알고리즘을 시작함)
 			}
 			if (k>man.size()-2){//가능한 k를 전부 돌려보았다면
 				return false;
 			}
-			System.out.println("만수루프");
 		} //만수가 0개가 되면 탈출함
+		head = tmpHead;		body1 = tmpBody1;	body2 = tmpBody2;	body3 = tmpBody3;	body4 = tmpBody4;// tmp을 몸으로 확정
+
 
 		int tmpCount2 = 0; // 디버그용
 		ArrayList<Tile> tmpSak = sak; //임시카피
-		while (!tmpSak.isEmpty()||tmpCount2 == 5){ // 다 찾아서 텐파이형태를 만족할 때 까지
+		while (!tmpSak.isEmpty()){ // 다 찾아서 텐파이형태를 만족할 때 까지
 			int k = 0; // 첫번째 타일을 대상으로 함. 가능한 상태는 1) 쓸모없음 2) 슌쯔로 사용됨 3) 커쯔로 사용됨 4) 머리로 사용됨  딱히 필요없는데 하다보니 셋팅함
 			int t = isStraingtInTmp(tmpSak, k);//슌쯔인지 확인
 			if (t!=-1){ // 슌쯔가 되면, 2)케이스
 				switch (bodyCount){ // 만들어진 몸통 개수에 맞게 넣고 정렬 후 지움
-				case 0: body1.add(tmpSak.remove(t+1)); body1.add(tmpSak.remove(t));body1.add(tmpSak.remove(k)); body1 = sortColor(body1); bodyCount++;continue;
-				case 1: body2.add(tmpSak.remove(t+1)); body2.add(tmpSak.remove(t));body2.add(tmpSak.remove(k)); body2 = sortColor(body2); bodyCount++;continue;
-				case 2: body3.add(tmpSak.remove(t+1)); body3.add(tmpSak.remove(t));body3.add(tmpSak.remove(k)); body3 = sortColor(body3); bodyCount++;continue;
-				case 3: body4.add(tmpSak.remove(t+1)); body4.add(tmpSak.remove(t));body4.add(tmpSak.remove(k)); body4 = sortColor(body4); bodyCount++;continue;
+				case 0: tmpBody1.add(tmpSak.remove(t+1)); tmpBody1.add(tmpSak.remove(t));tmpBody1.add(tmpSak.remove(k)); tmpBody1 = sortColor(tmpBody1); bodyCount++;continue;
+				case 1: tmpBody2.add(tmpSak.remove(t+1)); tmpBody2.add(tmpSak.remove(t));tmpBody2.add(tmpSak.remove(k)); tmpBody2 = sortColor(tmpBody2); bodyCount++;continue;
+				case 2: tmpBody3.add(tmpSak.remove(t+1)); tmpBody3.add(tmpSak.remove(t));tmpBody3.add(tmpSak.remove(k)); tmpBody3 = sortColor(tmpBody3); bodyCount++;continue;
+				case 3: tmpBody4.add(tmpSak.remove(t+1)); tmpBody4.add(tmpSak.remove(t));tmpBody4.add(tmpSak.remove(k)); tmpBody4 = sortColor(tmpBody4); bodyCount++;continue;
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
 			if (is3PairInTmp(tmpSak,k)){ // 커쯔가 되면, 3)케이스
 				switch (bodyCount){ // 만들어진 몸통 개수에 맞게 넣고 정렬 후 지움
-				case 0: body1.add(tmpSak.remove(k+2)); body1.add(tmpSak.remove(k+1));body1.add(tmpSak.remove(k)); body1 = sortColor(body1); bodyCount++;continue;
-				case 1: body2.add(tmpSak.remove(k+2)); body2.add(tmpSak.remove(k+1));body2.add(tmpSak.remove(k)); body2 = sortColor(body2); bodyCount++;continue;
-				case 2: body3.add(tmpSak.remove(k+2)); body3.add(tmpSak.remove(k+1));body3.add(tmpSak.remove(k)); body3 = sortColor(body3); bodyCount++;continue;
-				case 3: body4.add(tmpSak.remove(k+2)); body4.add(tmpSak.remove(k+1));body4.add(tmpSak.remove(k)); body4 = sortColor(body4); bodyCount++;continue;
+				case 0: tmpBody1.add(tmpSak.remove(k+2)); tmpBody1.add(tmpSak.remove(k+1));tmpBody1.add(tmpSak.remove(k)); tmpBody1 = sortColor(tmpBody1); bodyCount++;continue;
+				case 1: tmpBody2.add(tmpSak.remove(k+2)); tmpBody2.add(tmpSak.remove(k+1));tmpBody2.add(tmpSak.remove(k)); tmpBody2 = sortColor(tmpBody2); bodyCount++;continue;
+				case 2: tmpBody3.add(tmpSak.remove(k+2)); tmpBody3.add(tmpSak.remove(k+1));tmpBody3.add(tmpSak.remove(k)); tmpBody3 = sortColor(tmpBody3); bodyCount++;continue;
+				case 3: tmpBody4.add(tmpSak.remove(k+2)); tmpBody4.add(tmpSak.remove(k+1));tmpBody4.add(tmpSak.remove(k)); tmpBody4 = sortColor(tmpBody4); bodyCount++;continue;
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
-			if (tmpSak.size()%3==2){ // 머리가 있는 색이면 
+			if (tmpSak.size()%3==0)	{return false;} // 몸통만 있는 색에서 몸통에 포함이 안되면 완성이 안된 것이다.
+			if (tmpSak.size()%3==2){ // 그 요소는 몸통은 안되는데 머리일 수도 있다면
 				if (hasHead = true){ // 머리가 있는데 여기로 넘어오면 오류임 (체크용)
-					System.out.println("오류 - 머리가 2개인 케이스가 나옴");
+					System.out.println("오류 - 머리가 2개인 케이스가 나옴(삭수)");
 					return false;
 				}
 					
 				if ((tmpSak.get(k)).isHead(tmpSak.get(k+1))){// 다음칸이 머리면 (정렬했으니 다음칸이여야됨) 4)케이스
-					head.add(tmpSak.remove(k+1)); head.add(tmpSak.remove(k));head=sortColor(head); // 머리로 옮김
+					tmpHead.add(tmpSak.remove(k+1)); tmpHead.add(tmpSak.remove(k));tmpHead=sortColor(tmpHead); // 머리로 옮김
 					hasHead = true; // 머리 있음체크
 					continue; // 돌아감 (머리를 찾았음. 무한루프이면 여기가 오류가능성)
 				} else {// 머리도 아니면, 1)이므로 
@@ -467,40 +476,51 @@ class Player{
 				}
 			}
 			tmpCount2++;
-			System.out.println("삭수루프");
+			if (tmpCount2 == (sak.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpCount2 = 0;// tmpCount2=0
+				k++;// k++ (다음자리부터 알고리즘을 시작함)
+			}
+			if (k>sak.size()-2){//가능한 k를 전부 돌려보았다면
+				return false;
+			}
 		} //삭수가 0개가 되면 탈출함
+		head = tmpHead;		body1 = tmpBody1;	body2 = tmpBody2;	body3 = tmpBody3;	body4 = tmpBody4;// tmp을 몸으로 확정
 		
+
+
 		int tmpCount3 = 0; // 디버그용
 		ArrayList<Tile> tmpTong = tong; //임시카피
-		while (!tmpTong.isEmpty()||tmpCount3==5){ // 다 찾아서 텐파이형태를 만족할 때 까지
+		while (!tmpTong.isEmpty()){ // 다 찾아서 텐파이형태를 만족할 때 까지
 			int k = 0; // 첫번째 타일을 대상으로 함. 가능한 상태는 1) 쓸모없음 2) 슌쯔로 사용됨 3) 커쯔로 사용됨 4) 머리로 사용됨  딱히 필요없는데 하다보니 셋팅함
 			int t = isStraingtInTmp(tmpTong, k);//슌쯔인지 확인
 			if (t!=-1){ // 슌쯔가 되면, 2)케이스
 				switch (bodyCount){ // 만들어진 몸통 개수에 맞게 넣고 정렬 후 지움
-				case 0: body1.add(tmpTong.remove(t+1)); body1.add(tmpTong.remove(t));body1.add(tmpTong.remove(k)); body1 = sortColor(body1); bodyCount++;continue;
-				case 1: body2.add(tmpTong.remove(t+1)); body2.add(tmpTong.remove(t));body2.add(tmpTong.remove(k)); body2 = sortColor(body2); bodyCount++;continue;
-				case 2: body3.add(tmpTong.remove(t+1)); body3.add(tmpTong.remove(t));body3.add(tmpTong.remove(k)); body3 = sortColor(body3); bodyCount++;continue;
-				case 3: body4.add(tmpTong.remove(t+1)); body4.add(tmpTong.remove(t));body4.add(tmpTong.remove(k)); body4 = sortColor(body4); bodyCount++;continue;
+				case 0: tmpBody1.add(tmpTong.remove(t+1)); tmpBody1.add(tmpTong.remove(t));tmpBody1.add(tmpTong.remove(k)); tmpBody1 = sortColor(tmpBody1); bodyCount++;continue;
+				case 1: tmpBody2.add(tmpTong.remove(t+1)); tmpBody2.add(tmpTong.remove(t));tmpBody2.add(tmpTong.remove(k)); tmpBody2 = sortColor(tmpBody2); bodyCount++;continue;
+				case 2: tmpBody3.add(tmpTong.remove(t+1)); tmpBody3.add(tmpTong.remove(t));tmpBody3.add(tmpTong.remove(k)); tmpBody3 = sortColor(tmpBody3); bodyCount++;continue;
+				case 3: tmpBody4.add(tmpTong.remove(t+1)); tmpBody4.add(tmpTong.remove(t));tmpBody4.add(tmpTong.remove(k)); tmpBody4 = sortColor(tmpBody4); bodyCount++;continue;
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
 			if (is3PairInTmp(tmpTong,k)){ // 커쯔가 되면, 3)케이스
 				switch (bodyCount){ // 만들어진 몸통 개수에 맞게 넣고 정렬 후 지움
-				case 0: body1.add(tmpTong.remove(k+2)); body1.add(tmpTong.remove(k+1));body1.add(tmpTong.remove(k)); body1 = sortColor(body1); bodyCount++;continue;
-				case 1: body2.add(tmpTong.remove(k+2)); body2.add(tmpTong.remove(k+1));body2.add(tmpTong.remove(k)); body2 = sortColor(body2); bodyCount++;continue;
-				case 2: body3.add(tmpTong.remove(k+2)); body3.add(tmpTong.remove(k+1));body3.add(tmpTong.remove(k)); body3 = sortColor(body3); bodyCount++;continue;
-				case 3: body4.add(tmpTong.remove(k+2)); body4.add(tmpTong.remove(k+1));body4.add(tmpTong.remove(k)); body4 = sortColor(body4); bodyCount++;continue;
+				case 0: tmpBody1.add(tmpTong.remove(k+2)); tmpBody1.add(tmpTong.remove(k+1));tmpBody1.add(tmpTong.remove(k)); tmpBody1 = sortColor(tmpBody1); bodyCount++;continue;
+				case 1: tmpBody2.add(tmpTong.remove(k+2)); tmpBody2.add(tmpTong.remove(k+1));tmpBody2.add(tmpTong.remove(k)); tmpBody2 = sortColor(tmpBody2); bodyCount++;continue;
+				case 2: tmpBody3.add(tmpTong.remove(k+2)); tmpBody3.add(tmpTong.remove(k+1));tmpBody3.add(tmpTong.remove(k)); tmpBody3 = sortColor(tmpBody3); bodyCount++;continue;
+				case 3: tmpBody4.add(tmpTong.remove(k+2)); tmpBody4.add(tmpTong.remove(k+1));tmpBody4.add(tmpTong.remove(k)); tmpBody4 = sortColor(tmpBody4); bodyCount++;continue;
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
-			if (tmpTong.size()%3==2){ // 머리가 있는 색이면 
+			if (tmpTong.size()%3==0)	{return false;} // 몸통만 있는 색에서 몸통에 포함이 안되면 완성이 안된 것이다.
+			if (tmpTong.size()%3==2){ // 그 요소는 몸통은 안되는데 머리일 수도 있다면
 				if (hasHead = true){ // 머리가 있는데 여기로 넘어오면 오류임 (체크용)
 					System.out.println("오류 - 머리가 2개인 케이스가 나옴");
 					return false;
 				}
 					
 				if ((tmpTong.get(k)).isHead(tmpTong.get(k+1))){// 다음칸이 머리면 (정렬했으니 다음칸이여야됨) 4)케이스
-					head.add(tmpTong.remove(k+1)); head.add(tmpTong.remove(k));head=sortColor(head); // 머리로 옮김
+					tmpHead.add(tmpTong.remove(k+1)); tmpHead.add(tmpTong.remove(k));tmpHead=sortColor(tmpHead); // 머리로 옮김
 					hasHead = true; // 머리 있음체크
 					continue; // 돌아감 (머리를 찾았음. 무한루프이면 여기가 오류가능성)
 				} else {// 머리도 아니면, 1)이므로 
@@ -508,10 +528,22 @@ class Player{
 				}
 			}
 			tmpCount3++;
-			System.out.println("통수루프");
-		} //통수가 0개가 되면 탈출함
+			if (tmpCount3 == (tong.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpCount3 = 0;// tmpCount3=0
+				k++;// k++ (다음자리부터 알고리즘을 시작함)
+			}
+			if (k>tong.size()-2){//가능한 k를 전부 돌려보았다면
+				return false;
+			}
+		} //삭수가 0개가 되면 탈출함
+		head = tmpHead;		body1 = tmpBody1;	body2 = tmpBody2;	body3 = tmpBody3;	body4 = tmpBody4;// tmp을 몸으로 확정
 
 
+
+
+
+		int tmpCount4 = 0; 
 		ArrayList<Tile> tmpZa = za; //임시카피
 		while (!tmpZa.isEmpty()){ // 다 찾아서 텐파이형태를 만족할 때 까지
 			int k = 0; // 첫번째 타일을 대상으로 함. 가능한 상태는 1) 쓸모없음 3) 커쯔로 사용됨 4) 머리로 사용됨  딱히 필요없는데 하다보니 셋팅함
@@ -524,22 +556,31 @@ class Player{
 				default : System.out.println("오류 - 몸통 개수가 4개이상");
 				}
 			}
-			if (tmpZa.size()%3==2){ // 머리가 있는 색이면 
+			if (tmpZa.size()%3==2){ // 그 요소는 몸통은 안되는데 머리일 수도 있다면
 				if (hasHead = true){ // 머리가 있는데 여기로 넘어오면 오류임 (체크용)
 					System.out.println("오류 - 머리가 2개인 케이스가 나옴");
 					return false;
 				}
 					
 				if ((tmpZa.get(k)).isHead(tmpZa.get(k+1))){// 다음칸이 머리면 (정렬했으니 다음칸이여야됨) 4)케이스
-					head.add(tmpZa.remove(k+1)); head.add(tmpZa.remove(k));head=sortColor(head); // 머리로 옮김
+					tmpHead.add(tmpZa.remove(k+1)); tmpHead.add(tmpZa.remove(k));tmpHead=sortColor(tmpHead); // 머리로 옮김
 					hasHead = true; // 머리 있음체크
 					continue; // 돌아감 (머리를 찾았음. 무한루프이면 여기가 오류가능성)
 				} else {// 머리도 아니면, 1)이므로 
 					return false; // 실패
 				}
 			}
-			System.out.println("자패루프");
+			tmpCount4++;
+			if (tmpCount4 == (za.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpCount4 = 0;// tmpCount4=0
+				k++;// k++ (다음자리부터 알고리즘을 시작함)
+			}
+			if (k>za.size()-2){//가능한 k를 전부 돌려보았다면
+				return false;
+			}
 		} //자패가 0개가 되면 탈출함
+		head = tmpHead;		body1 = tmpBody1;	body2 = tmpBody2;	body3 = tmpBody3;	body4 = tmpBody4;// tmp을 몸으로 확정
 
 		tenpaiHead = head;
 		tenpaiBody1 = body1;
