@@ -1,13 +1,13 @@
 import java.util.*;
 
-class MahjongPractice{
+class MahjongPractice_backup5{
 	public static void main(String[] args) {
 		
 
 		while (true){//무한루프 : 반드시 빠져나올 조건이 있어야 함
 			System.out.println("*** 메뉴 선택 ***");
 			System.out.println("1. 나홀로 조패연습(25회)");
-			System.out.println("2. 역 체크 테스트");
+			System.out.println("2. 텐파이 로직 확인");
 			System.out.println("9. 프로그램 종료");
 			System.out.print("선택 >> ");
 			TilePile mountain = new TilePile(); //패산 생성
@@ -191,15 +191,6 @@ class Player{
 	ArrayList<Tile> tenpaiBody2 = null;
 	ArrayList<Tile> tenpaiBody3 = null;
 	ArrayList<Tile> tenpaiBody4 = null;
-	ArrayList<ArrayList<Tile>> tenpaiBodies = new ArrayList<>();
-	tenpaiBodies.add(tenpaiBody1);	tenpaiBodies.add(tenpaiBody2);	tenpaiBodies.add(tenpaiBody3);	tenpaiBodies.add(tenpaiBody4);	
-	boolean isRichi = false;
-	private int rank = 0;
-	boolean open = false;
-	
-	public void addRank(int n){
-		rank += n;
-	}
 	
 	public Player(int wind, TilePile mountain){ // 현재 패산(게임)에서 몇번째)
 		if (!(wind>=0&&wind<4))	{
@@ -571,11 +562,11 @@ class Player{
 		} //자패가 0개가 되면 탈출함
 		head = tmpHead;		body1 = tmpBody1;	body2 = tmpBody2;	body3 = tmpBody3;	body4 = tmpBody4;// tmp을 몸으로 확정
 
-		tenpaiHead = sortColor(head);
-		tenpaiBody1 = sortColor(body1);
-		tenpaiBody2 = sortColor(body2);
-		tenpaiBody3 = sortColor(body3);
-		tenpaiBody4 = sortColor(body4);
+		tenpaiHead = head;
+		tenpaiBody1 = body1;
+		tenpaiBody2 = body2;
+		tenpaiBody3 = body3;
+		tenpaiBody4 = body4;
 
 		return true;
 
@@ -590,165 +581,13 @@ class Player{
 }
 
 class ListHandler{
-	static String showList(ArrayList<Tile> list){ // 리스트를 문자열로 보여줌
+	static String showList(ArrayList<Tile> list){
 		String str = "";
 		for (int i = 0;i<list.size() ;i++ ){
 			str = str + " " + (list.get(i)).show();
 		}
 		return str;
 	}
-
-	static int isFlush(ArrayList<Tile> list){ // 리스트가 일색인지 체크하고, 아니면 -1, 맞으면 0143(만수통자) 없으면 99
-		boolean flush = true;
-		int color = -1;
-		for (int i=0;i<list.size();i++){
-			if ((list.get(i)).getColor()!=(list.get(i+1)).getColor(){
-				flush = false;
-			}
-		}
-		if (flush){
-			if (list == null){
-				color = 99;
-			} else {
-				color = (list.get(0)).getColor();
-			}
-		}
-		return color;
-	}
-
-	static boolean isTanyo(ArrayList<Tile> list){ // 중장패로만 이루어졌는지 확인
-		boolean tanyo = true;
-		for (int i=0;i<list.size();i++){
-			if ((list.get(i)).getNumber()==9 ||(list.get(i)).getNumber()==1 ||(list.get(i)).getColor==4){// 1이거나 9거나 자패면
-				tanyo = false;
-			}
-		}
-		return tanyo;
-	}
-
-	static boolean is3PairBody(ArrayList<Tile> list){
-		if (list == null){
-			return false;
-		}
-		return (list.get(i)).isHead(list.get(i+1));
-	}
-
-	static boolean hasTile(ArrayList<Tile> list, int color, int number){
-		if (list == null){
-			return false;
-		}
-		for (int i = 0;i<list.size() ;i++ ){
-			if ((list.get(i)).getNumber()==number&&(list.get(i)).getColor()==color)	{ // i번째가 원하는 타일이면
-				return true;
-			}
-		}
-		return false;
-	}
 }
-
-class Rankchecker{
-		tenpaiHead = head;
-		tenpaiBody1 = body1;
-		tenpaiBody2 = body2;
-		tenpaiBody3 = body3;
-		tenpaiBody4 = body4;
-
-	int rank = 0; // 다시 세팅 (player안으로?)
-
-	static boolean richi(Player player){ // 리치를 한 상태면 리치1판
-		if (player.isRichi = true){
-			player.addRank(1);
-			return true;
-		}
-		return false;
-	}
-
-	static boolean tanyo(Player player){ // 각 머리,몸통이 모두 탕야요조건을 만족하면 탕야오 
-		boolean tFlag = ListHandler.isTanyo(tenpaiHead)&&ListHandler.isTanyo(tenpaiBody1)
-			&&ListHandler.isTanyo(tenpaiBody2)&&ListHandler.isTanyo(tenpaiBody3)&&ListHandler.isTanyo(tenpaiBody4);
-
-		if (tFlag){
-			player.addRank(1);
-			return true;
-		}
-		return false;
-	}
-
-	static boolean tsumo(Player player){}  // 쯔모/론 어떻게 구현할지 고민한 뒤 구현
-
-	static boolean twin(Player player){ // 이페코
-		boolean flag = false;
-		if (player.open){
-			return false; // 열면 안됨
-		}
-			
-		for (i=0;i<tenpaiBodies.size()-1 ;i++ ){ // 각 몸통에 대해
-			if (ListHandler.is3PairBody((tenpaiBodies.get(i)))){ // 커쯔면
-				continue; // 넘어감
-			} else{
-				flag = ((tenpaiBodies.get(i)).get(0)).isHead((tenpaiBodies.get(i+1)).get(0)) // 슌쯔이므로, 시작패가 같으면 이페코임 또한, body가 색순서로 정렬되므로 다음 body만 체크
-			}
-		}
-		if (flag){
-			player.addRank(1);
-		}
-
-		return flag;
-	}
-
-	static boolean doubleTwin(Player player){
-		boolean flag = false;
-		if (player.open){
-			return false; // 열면 안됨
-		}
-			
-		for (i=0;i<tenpaiBodies.size()-1 ;i++ ){ // 각 몸통에 대해
-			if (ListHandler.is3PairBody((tenpaiBodies.get(i)))){ // 커쯔면
-				return false; // 량페코 안됨
-			} 
-		}
-		
-		flag = ((tenpaiBodies.get(0)).get(0)).isHead((tenpaiBodies.get(1)).get(0))&& ((tenpaiBodies.get(2)).get(0)).isHead((tenpaiBodies.get(3)).get(0))
-		// body는 정렬됬으므로 0,1번째 몸통이 이페코여야 하고, 2,3번째 몸통이 이페코여야 함
-
-		if (((tenpaiBodies.get(0)).get(0)).isHead((tenpaiBodies.get(3)).get(0))){
-			return false; // 4개 모두 같은 것이면 이페코로 쳐주지 않음
-		}
-
-		if (flag){
-			player.addRank(2); // 1판은 이페코 체크에서 받음
-		}
-
-		return flag;
-	}
-	
-	static boolean peace(Player player){} // 부수 구현한 후에 구현
-
-	static boolean straight(Player player){ // 일기통관
-		boolean canFlag = false;
-		int startPoint = s
-		for (i=0;i<tenpaiBodies.size()-1 ;i++ ){ // 각 몸통에 대해
-			if (!(ListHandler.is3PairBody((tenpaiBodies.get(i)))||(!ListHandler.hasTile(tenpaiBodies.get(i), 0, 1)&&!ListHandler.hasTile(tenpaiBodies.get(i), 1, 1)&&!ListHandler.hasTile(tenpaiBodies.get(i), 2, 1)))){ // 123이 없으면 (커쯔거나, 1이 없거나)
-				canFlag = true; // 일기통관 가능함
-				s=i; // 123이 있는 몸통
-			} 
-		}
-		if (s>=2||!canFlag){ // 2개 이상의 자리가 없음 or 불가능함(123이 없음)이면
-			return false;
-		}
-
-		boolean colorCheck; 	// 3개의 연속된 것이 같은 색인가?
-		colorCheck = ((tenpaiBodies.get(i)).get(0)).getColor()==((tenpaiBodies.get(i+1)).get(0)).getColor()&&((tenpaiBodies.get(i)).get(0)).getColor()==((tenpaiBodies.get(i+2)).get(0)).getColor();
-	
-		boolean numCheck;		// 456, 789인가?
-		if ()
-		{
-		}
-
-		
-	}
-
-}
-
 
 

@@ -410,6 +410,10 @@ class Player{
 			if (tmpMan.size()%3==2){ // 그 요소는 몸통은 안되는데 머리일 수도 있다면
 				if (hasHead = true){ // 머리가 있는데 여기로 넘어오면 오류임 (체크용)
 					System.out.println("오류 - 머리가 2개인 케이스가 나옴(만수)");
+					System.out.println(hasHead);
+					System.out.println(tmpMan.get(0).show());
+					System.out.println(tmpMan.get(1).show());
+					System.out.println("오류 - 머리가 2개인 케이스가 나옴(만수)");
 					return false;
 				}
 					
@@ -426,7 +430,7 @@ class Player{
 			tmpCount1++; //몇번 돌았는지 셈
 
 			if (tmpCount1 == (man.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
-				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4; hasHead = false;// tmp값 복원하기
 				tmpCount1 = 0;// tmpCount1=0
 				k++;// k++ (다음자리부터 알고리즘을 시작함)
 			}
@@ -477,7 +481,7 @@ class Player{
 			}
 			tmpCount2++;
 			if (tmpCount2 == (sak.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
-				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4; hasHead = false;// tmp값 복원하기
 				tmpCount2 = 0;// tmpCount2=0
 				k++;// k++ (다음자리부터 알고리즘을 시작함)
 			}
@@ -529,7 +533,7 @@ class Player{
 			}
 			tmpCount3++;
 			if (tmpCount3 == (tong.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
-				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4; hasHead = false;// tmp값 복원하기
 				tmpCount3 = 0;// tmpCount3=0
 				k++;// k++ (다음자리부터 알고리즘을 시작함)
 			}
@@ -572,7 +576,7 @@ class Player{
 			}
 			tmpCount4++;
 			if (tmpCount4 == (za.size()/3)+1){  // 돌 수 있는 최대만큼 돌았다면, k=0에서 스타트한 것은 실패한 것이다.
-				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4;// tmp값 복원하기
+				tmpHead = head;		tmpBody1 = body1;	tmpBody2 = body2;	tmpBody3 = body3;	tmpBody4 = body4; hasHead = false;// tmp값 복원하기
 				tmpCount4 = 0;// tmpCount4=0
 				k++;// k++ (다음자리부터 알고리즘을 시작함)
 			}
