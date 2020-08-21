@@ -91,3 +91,35 @@ DBMS(DataBase Management System)
 
 5. 함수(Function)
  - 프로시저와 비슷하며, 리턴값이 존재함
+
+MySQL에서의 자료형 (DataType)
+숫자형식
+정수
+ - tinyint : 1byte. -128~127 까지의 정수 표현
+ - smallint : 2byte. -32768~32767 까지의 정수 표현
+ - mediumint : 3byte. -8388608~8388607 까지의 정수 표현
+ - int : 4byte. 약 -21억~21억 까지의 정수 표현
+ - bigint : 8byte. 약 -900경~900경 까지의 정수 표현
+실수
+ - float : 4byte. -3.40E+38 ~ -1.17E-38. 소수점 아래 7자리까지 표현
+ - doublt : 8byte. -1.22E-308~1.79E+308. 소수점 아래 15자리까지 표현
+
+문자데이터 형식
+ - char(n) : 1~255자의 문자를 표현하는 고정길이 문자형
+ - varchar(n) : 1~65535자의 문자를 표현하는 가변길이 문자형
+ - tinytext : 1~255크기의 text데이터
+ - text : 1~65535크기의 text데이터
+ - mediumtext : 1~16777215크기의 text데이터
+ - longtext : 1~4294967295크기의 text데이터 (최대 4GB 크기)
+
+BLOB형식 : Binary Large Object - 이미지, 동영상, 문서파일 등의 대용량 이진데이터
+ - tinyblob : 1~255크기의 blob데이터
+ - blob : 1~65535크기의 blob데이터
+ - mediumblob : 1~16777215크기의 blob데이터
+ - longblob : 1~4294967295크기의 blob데이터 (최대 4GB 크기)
+
+날짜데이터 형식
+ - date : 3byte. 1001-01-01~9999-12-31까지 'YYYY-MM-DD'형식의 날짜만 저장
+ - time : 3byte. -838:59:59.000000 ~ 838:59:59.000000까지 'HH:MM:SS'형식의 시간만 저장
+ - datetime : 8byte. 1001-01-01 00:00:00~9999-12-31 12:59:59까지 'YYYY-MM-DD HH:MM:SS'형식으로 저장
+ - year : 1byte. 1901~2155까지 'YYYY'형식으로 저장

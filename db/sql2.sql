@@ -76,7 +76,39 @@ create table t_productlist(
 	pl_id varchar(20) primary key,	-- 상품 아이디
     pl_name varchar(50) not null,  	-- 상품명
     pl_price int default 0,			-- 가격
+    pl_origin varchar(20) not null, -- 원산지
+    pl_img1 varchar(50) not null,	-- 상품이미지1
+    pl_img2 varchar(50),			-- 상품이미지2
+    pl_img3 varchar(50),			-- 상품이미지3
+    pl_desc varchar(50),			-- 설명이미지
+    pl_stock int default -1,		-- 재고
+    pl_isview char(1) default 'N'	-- 게시여부
+);
+
+create table t_orderlist(
+	ol_id varchar(20) primary key,		-- 주소id
+    ml_id varchar(20),					-- 회원id
+    ol_rname varchar(50) not null,		-- 수취인명
+    ol_rphone varchar(13) not null,		-- 수취인전화번호
+    ol_rzip char(5) not null, 			-- 배송지 우편번호
+    ol_radd1 varchar(50) not null,		-- 배송지 주소1
+    ol_radd2 varchar(50) not null,		-- 배송지 주소2
+    ol_payment char(1) default 'a',		-- 결제방식
+    ol_payt int default '0',			-- 결제액
+    ol_comment varchar(100),			-- 요구사항
+    ol_status char(1) default 'a',		-- 주문상태
+    ol_date datetime default now(),		-- 주문일
+    constraint fk_t_order_ml_id foreign key(ml_id) references t_memberlist(ml_id)
 );
 
 create table t_orderdetail(
+	od_id int unsigned auto_increment primary key,		-- 주문상세id
+    ol_id varchar(20),									-- 주문id
+    pl_id varchar(20),									-- 상품id
+    od_cnt int default 1,								-- 상품개수
+    od_img varchar(50) not null,						-- 상품 이미지
+    od_price int default 0,								-- 상품 단가
+    od_name varchar(50) not null,						-- 상품명
+    constraint fk_t_order_ol_id foreign key(ol_id) references t_orderlist(ol_id) on delete cascade,
+    constraint fk_t_order_pl_id foreign key(pl_id) references t_productlist(pl_id) on delete cascade
 );
