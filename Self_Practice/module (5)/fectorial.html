@@ -1,0 +1,234 @@
+<html>
+<head>
+    <script lang="javascript" src="sheetjs/dist/xlsx.full.min.js"></script>
+    <script>
+        let inputArr = [];
+        let EXCEL_JSON = {};
+        let questions = [];
+        let allCollectCode = [];
+        let result = [];
+        let seq = 0;
+        let depth = 1;
+        
+        function main(data) {
+            for(var i=0;i<data.length;i++) {
+                inputArr.push(data[i].code + "");
+                for(var j=0;j<data.length;j++) {
+                    allCollectCode.push({
+                        "from":data[i].code + "",
+                        "to":data[j].code + "",
+                        "value":0,
+                    });
+                }
+            }
+            //inputArr = document.getElementById("inputVal").value.split(",");            
+            // let tdStr = "";
+            // let thStr = "<tr><th></th>";
+            // let trStr = "<tr>";
+
+            // for(var i=1;i<=size;i++) {
+                
+                // thStr += "<th>"+inputArr[i-1]+"</th>";
+                // tdStr += "<td>-</td>";
+            // }
+            // thStr += "</tr>";
+            
+            // for(var i=0;i<result.length;i++) {
+            //     trStr+="<tr>";
+            //     trStr+="<td>"+result[i]+"</td>" + tdStr;
+            //     trStr+="</tr>";
+            // }
+            
+            // document.getElementById("result-head").innerHTML = thStr;
+            // document.getElementById("result-body").innerHTML = trStr;
+        }
+
+        function factorial(arr) {     
+            // if(seq === 0) {
+            //     for(var i=0;i<arr.length;i++) {
+            //         for(var j=0;j<arr.length;j++) {
+            //             allCollectCode.push({
+            //                 "from":arr[i] + "",
+            //                 "to":arr[j] + "",
+            //                 "value":0,
+            //             });
+            //         }
+            //         seq++;
+            //     }
+            // } 
+            // else if(index === arr.length) {
+            //     for(var i=0;i<arr.length;i++) {
+            //         allCollectCode.push({
+            //             "from": arr.join(),
+            //             "to": arr[i] + "",
+            //             "value": 0
+            //         });
+            //     }
+            // } else {                
+            //     for(var i=0;i<arr.length-1;i++) {
+            //         let tmp = [];
+            //         tmp.push(arr[i]);
+            //         for(var j=i+1;j<arr.length;j++) {
+            //             tmp.push(arr[j]);
+
+            //             if(tmp.length === index) {
+            //                 for(var k=0;k<arr.length;k++) {
+            //                     allCollectCode.push({
+            //                         "from": Object.assign(tmp.join())+"",
+            //                         "to": arr[k] + "",
+            //                         "value": 0
+            //                     });
+            //                 }
+            //                 tmp.splice(tmp.length-1,1);
+            //             }
+            //         }
+            //     }
+            // }        
+        }
+
+        function makeQuestions() {                 
+            for(var i=0;i<allCollectCode.length;i++) {                
+                if(allCollectCode[i].from === allCollectCode[i].to) {
+                    setAnswer(null, allCollectCode[i].from, allCollectCode[i].to, "1");
+                } else {
+                    let str = "<p>" + allCollectCode[i].from + "을 모르면" + allCollectCode[i].to + "도 모르는가?</p>";
+                    str += "<select onchange='setAnswer("+seq+",\""+allCollectCode[i].from+"\",\""+allCollectCode[i].to+"\",this.value);'><option value=''>선택</option><option value='1'>예</option><option value='-1'>아니오</option></select>";
+                    questions.push(str);
+                    seq++;
+                } 
+            }
+            console.log(questions);
+        }
+
+        function setAnswer(index, from, to, value) {
+            let selIndex = allCollectCode.findIndex((row) => {
+                return row.from === from && row.to === to;
+            });
+            allCollectCode[selIndex].value = value;
+
+            if(index !== null) {
+                if(questions.length - 1 === index) {                                        
+                    result = Object.assign(result,allCollectCode);                                        
+                    
+                    //추가 block 만들기
+                    if(depth === 1) {
+                        allCollectCode = [];
+
+                        for(var j in inputArr) {
+                            let knowledgeStructure = [];  
+                            for(var i in result) {     
+                                console.log(inputArr[j],result[i].from);                       
+                                if(inputArr[j] === result[i].from) {                     
+                                    if(result[i].value === "-1") {
+                                        knowledgeStructure.push(result[i].to);
+                                    }                        
+                                } else if(inputArr[j] < result[i].from) {                     
+                                    break;
+                                }
+                            }
+
+                            if(knowledgeStructure.length > 0) {
+                                for(var i in inputArr) {                            
+                                    allCollectCode.push({
+                                        "from": knowledgeStructure.join() + "",
+                                        "to" : inputArr[i]
+                                    });
+                                }
+                            }
+                        }
+                    } else {
+                        let knowledgeStructure = [];  
+                        
+                        for(var i in allCollectCode) {     
+                            if(allCollectCode[i].value === "-1") {
+                                knowledgeStructure.push(allCollectCode[i].to);
+                            }                        
+                        }
+                        
+                        allCollectCode = [];
+
+                        if(knowledgeStructure.length > 0) {
+                            for(var i in inputArr) {                            
+                                allCollectCode.push({
+                                    "from": knowledgeStructure.join() + "",
+                                    "to" : inputArr[i]
+                                });
+                            }
+                        }
+                    }
+
+                    if(allCollectCode.length === 0) {
+                        console.log("최종 : ", result);
+                    } else {
+                        console.log(allCollectCode);
+                        depth++;
+                        questions = [];
+                        seq = 0;
+                        makeQuestions();
+                        renderQuestion(0);
+                    }
+                } else {
+                    console.log("answer index : ", index);
+                    index++;
+                    renderQuestion(index);
+                }
+            }
+        }
+
+        function renderQuestion(index) {
+            document.getElementById("render-question").innerHTML = questions[index];
+        }
+
+        window.onload = () => {
+            // document.getElementById("call").onclick = () => {
+            //     main();
+            // }
+
+            document.getElementById("my_file_input").onchange = (e) => {
+                var files = e.target.files; //input file 객체를 가져온다.
+                var i,f;
+                for (i = 0; i != files.length; ++i) {
+                    f = files[i];
+                    var reader = new FileReader(); //FileReader를 생성한다.         
+                    
+                    //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
+                    reader.onload = function(e) {
+                        
+                        var data = e.target.result; //FileReader 결과 데이터(컨텐츠)를 가져온다.
+
+                        //바이너리 형태로 엑셀파일을 읽는다.
+                        var workbook = XLSX.read(data, {type: 'binary'});
+                        
+                        //엑셀파일의 시트 정보를 읽어서 JSON 형태로 변환한다.
+                        workbook.SheetNames.forEach(function(item, index, array) {
+                            EXCEL_JSON = XLSX.utils.sheet_to_json(workbook.Sheets[item]);
+                        });//end. forEach
+                        main(EXCEL_JSON);
+                        makeQuestions();
+                        renderQuestion(0);
+                    }; 
+                    
+                    //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
+                    reader.readAsBinaryString(f);
+                
+                }//end. for
+            }
+            console.log("init load");
+        }        
+    </script>
+</head>
+<body>
+    <!-- <input type="text" id="inputVal" style="width:400px;" value="0">
+    <button id="call">Call</button> -->
+    <input type="file" id="my_file_input">
+    <div id="render-question">
+        
+    </div>
+    <div>
+        <table border="1">
+            <thead id="result-head"></thead>
+            <tbody id="result-body"></tbody>
+        </table>
+    </div>
+</body>
+</html>

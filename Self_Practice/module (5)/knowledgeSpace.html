@@ -1,0 +1,783 @@
+<html>
+<head>
+    <style type="text/css">
+        #graph-container {
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width:70%;
+            height: 400px;
+        }
+    </style>
+    <script src="js/sigma.min.js"></script>
+    <script src="js/sigma.parsers.json.min.js"></script>
+    <script src="sheetjs/dist/xlsx.full.min.js"></script>
+    <script>
+        let seq = -1;
+        let depth = 1;
+        let arr_a = [];
+        let arr_x = [];
+        let blocks = [];
+        let pDataset = [];
+        let nDataset = [];
+        let questions = [];
+        let knowledgeStructure = [];  
+        let hirarchys = [];
+        let exportExcel = [];
+
+        window.onload = () => {            
+            console.log("init load");
+
+            //1. file upload            
+            fileUpload(start);
+        }   
+
+        function fileUpload(callback) {
+            let exportExcel = [];
+            document.getElementById("my_file_input").onchange = (e) => {
+                var files = e.target.files; //input file 객체를 가져온다.
+                var i,f;
+                for (i = 0; i != files.length; ++i) {
+                    f = files[i];
+                    var reader = new FileReader(); //FileReader를 생성한다.         
+                    
+                    //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
+                    reader.onload = function(e) {
+                        
+                        var data = e.target.result; //FileReader 결과 데이터(컨텐츠)를 가져온다.
+
+                        //바이너리 형태로 엑셀파일을 읽는다.
+                        var workbook = XLSX.read(data, {type: 'binary'});
+                        
+                        //엑셀파일의 시트 정보를 읽어서 JSON 형태로 변환한다.
+                        workbook.SheetNames.forEach(function(item, index, array) {
+                            exportExcel = XLSX.utils.sheet_to_json(workbook.Sheets[item]);
+                        });//end. forEach
+                        
+                        callback(exportExcel);
+                    }; 
+                    
+                    //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
+                    reader.readAsBinaryString(f);
+                
+                }//end. for
+            }
+        }
+
+        function start(data) {
+            init();
+            exportExcel = data;
+            //2. make a block                        
+            let tmpArr = [];
+            for(var i in exportExcel) {
+                tmpArr.push(exportExcel[i].code);
+            }
+            knowledgeStructure.push(tmpArr.join() + "");
+            makeBlocks();
+
+            //3. make a question
+            makeQuestion('init');   
+        }
+
+        function init() {
+            seq = -1;
+            depth = 1;
+            arr_a = [];
+            arr_x = [];            
+            blocks = [];
+            pDataset = [];
+            nDataset = [];
+            questions = [];
+            knowledgeStructure = [];  
+            hirarchys = [];
+            
+            document.getElementById("render-question").style.display = "block";
+            document.getElementById("result-table").innerHTML = "";
+            document.getElementById("result").innerHTML = "";
+            document.getElementById("render-path").innerHTML = "";
+            document.getElementById("graph-container").innerHTML = "";
+        }
+
+
+
+        function makeBlocks() {
+            arr_a["block"+depth] = [];
+            if(depth === 1) {                
+                for(var i in exportExcel) {
+                    let a = exportExcel[i].code + "";
+                    arr_a["block"+depth].push(a);
+                    arr_x.push(a);
+                    blocks["ele"+a]= {};
+                    for(var j in exportExcel) {
+                        let x = exportExcel[j].code + "";                        
+
+                        let value = 0;                        
+                        if(a === x) {
+                            value = 1;
+                        }                        
+                        blocks["ele"+a][x] = value;
+                    }
+                }                
+            } else {
+                let candidates = [];
+                let tmpDepth = depth - 1;
+                for(var i in arr_a["block"+tmpDepth]) {
+                    let block = arr_a["block"+tmpDepth][i];
+                    if(block.split(",").length === tmpDepth) {
+                        for(var j in nDataset["data"+block]) {
+                            if(block !== nDataset["data"+block][j]) {
+                                let newBlock = nDataset["data"+block][j] + "," + block;
+                                if(block < nDataset["data"+block][j]) {
+                                    newBlock = block + "," + nDataset["data"+block][j];
+                                }
+                                newBlock = newBlock.split(",").sort().toString();
+
+                                let idx = candidates.findIndex((row) => {
+                                    return row === newBlock;
+                                });
+
+                                if(idx === -1) {
+                                    candidates.push(newBlock);
+                                }
+                            }                            
+                        }
+                    }
+                }
+
+                for(var i in candidates) {
+                    let elements = candidates[i];
+                    let element_arr = elements.split(",");
+                    let element = element_arr[0];
+                    let count = 0;
+                    let tmp_arr = pDataset["data"+element];
+                    
+                    if(tmp_arr !== undefined) {
+                        for(var j in element_arr) {
+                            let idx = tmp_arr.findIndex((row)=>{
+                                return row === element_arr[j];
+                            });
+
+                            if(idx > -1) {
+                                count++;
+                            }
+                        }
+
+                        if(count !== element_arr.length) {
+                            arr_a["block"+depth].push(elements);
+                            blocks["ele"+elements] = {};
+                            for(var k in arr_x) {
+                                blocks["ele"+elements][arr_x[k]] = 0;
+                            } 
+                        }
+                    }
+                }
+            }
+            console.log("arr_a : ", arr_a , "arr_x", arr_x);
+            console.log("block " + depth + ":", blocks);
+        }
+
+        function makeQuestion(flag) {
+            let str = "";
+            let block_qs = arr_a["block"+depth];
+            for(var i in block_qs) {
+                let a = block_qs[i];
+                let block = blocks["ele"+a];
+                for(var j in arr_x) {
+                    let x = arr_x[j];
+                    if(block[x] === 0) {
+                        renderSelect(block_qs[i],arr_x[j]);
+                        seq++;
+                        questions[seq] = {
+                            "a":block_qs[i],
+                            "x":arr_x[j]
+                        }            
+                        //console.log("question : ", seq, questions);
+                        return;
+                    }
+                }
+            }
+
+            if(str === "") {                
+                if(flag==='init') {
+                    makeKnowledgeStructure();
+                    renderGraph();
+                } else {
+                    getKnowledgeStructure();
+                }
+            }
+        }
+
+        function renderSelect(a,x) {
+            let str = "<p>" + a + "을 모르면" + x + "도 모르는가?</p>";
+            str += "<select name='question' onchange='setAnswer(\""+a+"\","+x+",this.value);' onkeypress='setKeyPress(event, \""+a+"\","+x+")'><option value=''>선택</option><option value='1'>예</option><option value='-1'>아니오</option></select>";
+            if(seq !== -1) {
+                str += "<button onclick='undo();'>Undo</button>"
+            }
+            
+            document.getElementById("render-question").innerHTML = str;
+            setTimeout(() => {
+                document.getElementsByName("question")[0].focus();
+            });
+        }
+
+        function setKeyPress(event, as,xs) {            
+            let value = "1";
+            if(event.keyCode === 120) {
+                value = "-1";
+            }
+
+            //console.log(event.keyCode, value);
+            if(event.keyCode === 120 || event.keyCode === 122) {
+                setAnswer(as,xs,value);
+            }
+        }
+
+        function undo() {
+            //console.log("undo start : ", seq, questions);
+            if(seq !== 0) {
+                blocks["ele"+questions[seq].a][questions[seq].x] = 0;
+                questions.splice(seq,1);                
+                seq--;
+                let a = questions[seq].a;
+                let x = questions[seq].x;
+                
+                //console.log("undo end : ", seq, blocks, Object.assign([], questions));
+                renderSelect(a,x);                    
+            }            
+        }
+
+        function setAnswer(as,xs,value) {
+            blocks["ele"+as][xs] = parseInt(value);
+            for(var i in arr_a["block"+depth]) {
+                let bs = arr_a["block"+depth][i];
+                let block = blocks["ele"+bs];
+                for(var j in arr_x) {
+                    let ys = arr_x[j];
+                    //yes
+                    if(value === 1) { 
+                        if(blocks["ele"+bs][ys] === 0) {                                               
+                            //case 1
+                            for(var k in as) {                            
+                                if(blocks["ele"+bs][as[k]] === 1) {
+                                    let unionVal = as + "," + xs;
+                                    if(blocks["ele"+unionVal] !== undefined) {
+                                        if(blocks["ele"+unionVal][ys] === 1) {
+                                            blocks["ele"+bs][ys] = 1; 
+                                        }
+                                    } 
+                                } 
+                            }                        
+                            //console.log("yes case 1 :", blocks);
+                            
+                            //case 2 
+                            if(blocks["ele"+as][ys] === -1) {
+                                let unionVal = as + "," + xs;
+                                if(blocks["ele"+unionVal] !== undefined) {
+                                    for(var k in bs) {  
+                                        if(blocks["ele"+unionVal][bs[k]] === 1) {
+                                            blocks["ele"+bs][ys] = -1; 
+                                        }
+                                    }
+                                } 
+                            } 
+                            //console.log("yes case 2 :", blocks);
+
+                            //case 3
+                            if(blocks["ele"+bs][xs] === -1) {
+                                let unionVal = bs + "," + ys;
+                                if(blocks["ele"+unionVal] !== undefined) {
+                                    for(var k in as) {  
+                                        if(blocks["ele"+unionVal][as[k]] === 1) {
+                                            blocks["ele"+bs][ys] = -1; 
+                                        }
+                                    }
+                                }
+                            }
+                            //console.log("yes case 3 :", blocks);
+                        }
+                    } else {
+                        //no
+                        if(blocks["ele"+bs][ys] === 0) {       
+                            for(var k in bs) {                            
+                                if(blocks["ele"+as][bs[k]] === 1) {
+                                    let unionVal = bs + "," + ys;
+                                    if(blocks["ele"+unionVal] !== undefined) {
+                                        if(blocks["ele"+unionVal][xs] === 1) {
+                                            console.log("no :", bs, ys);
+                                            blocks["ele"+bs][ys] = -1; 
+                                        }
+                                    } 
+                                } 
+                            }  
+                            //console.log("no :", blocks);
+                        }
+                    }
+                }
+            }
+
+            makeQuestion('no_init');
+        }
+
+        function getKnowledgeStructure() {
+            //console.log("completed block " + depth + ":", blocks);
+            //knowledge structure 만들기     
+            let block_as = arr_a["block"+depth];                       
+            for(var i in block_as) {                  
+                let tmpArr = [];   
+                let elements = block_as[i].split(",");
+                if(elements.length === depth) {
+                    for(var j in arr_x) {                         
+                        if(blocks["ele"+block_as[i]][arr_x[j]] === -1) {
+                            let idx = tmpArr.findIndex((row)=> {
+                                return row === arr_x[j];
+                            });
+
+                            if(idx === -1) {
+                                tmpArr.push(arr_x[j]);
+                            }
+                        }
+                    }
+                }
+
+                if(tmpArr.length > 0) {     
+                    let value = tmpArr.join() + "";             
+                    let idx = knowledgeStructure.findIndex((row) => {
+                        return row === value;
+                    });
+
+                    if(idx === -1) {                        
+                        knowledgeStructure.push(value);
+                    }
+                }  
+            }
+            
+            //console.log("depth" + depth, knowledgeStructure);
+            //makeTable();
+            if(depth === exportExcel.length - 1) {
+                //console.log(knowledgeStructure);
+                makeKnowledgeStructure();
+                renderGraph();
+            } else {
+                //dataset 분류
+                let block_as = arr_a["block"+depth];
+                for(var i in block_as) {
+                    let elements = block_as[i].split(",");
+                    if(elements.length === depth) {
+                        if(pDataset["data"+block_as[i]] === undefined) {
+                            pDataset["data"+block_as[i]] = [];
+                        }
+
+                        if(nDataset["data"+block_as[i]] === undefined) {
+                            nDataset["data"+block_as[i]] = [];
+                        }
+
+                        for(var j in arr_x) {
+                            if(blocks["ele"+block_as[i]][arr_x[j]] === 1) {                            
+                                pDataset["data"+block_as[i]].push(arr_x[j]);
+                            } else {                            
+                                nDataset["data"+block_as[i]].push(arr_x[j]);
+                            }
+                        }
+                    }
+                }
+
+                // console.log("block "+depth+" - dataset : ", pDataset, nDataset);
+                // console.log("block "+depth+" - knowledgeStructure : ", knowledgeStructure);
+                depth++;
+                seq = -1;
+                questions = [];
+                makeBlocks();
+                // block 생성 후 자동 값 입력
+                setAutoValue();
+                makeQuestion('init');
+            }
+        }
+
+        function makeKnowledgeStructure() {
+            //console.log("최종 : ", knowledgeStructure);
+            knowledgeStructure.sort((a, b) => {
+                if(a.length > b.length) {
+                    return 1;
+                } 
+                if(a.length < b.length) {
+                    return -1
+                }
+                return 0;
+            });
+            document.getElementById("render-question").style.display = "none";
+            document.getElementById("result").innerHTML = "Knowledge Structure : " + knowledgeStructure.join("/");
+
+            hirarchys = makeHirarchy();
+            renderHirarchy(hirarchys);            
+        }
+
+        function setAutoValue() {
+            let tmpBeforeArr = [];
+            let tmpCurrentArr = [];       
+            let tmpSetArr = [];   
+            let checkbox = []; 
+            
+            /**
+            * init plus 
+            */
+            for(var i in arr_a) {
+                if(i === "block" + depth) {
+                    tmpCurrentArr = tmpCurrentArr.concat(arr_a[i]);    
+                } else {
+                    tmpBeforeArr = tmpBeforeArr.concat(arr_a[i]);                    
+                }
+            }
+
+            for(var i in tmpCurrentArr) {
+                let currentElements = tmpCurrentArr[i].split(",");
+                let N = Object.assign([],tmpBeforeArr);
+                do {
+                    let M = Object.assign([],N);
+                    checkbox = [];
+                    for(var j in M) {          
+                        let positiveArr = pDataset["data"+M[j]];
+                        let existCnt = 0;
+                        if(currentElements.length >= positiveArr.length) {
+                            for(var k in positiveArr) {
+                                let findIdx = currentElements.findIndex((row) => {
+                                    return row === positiveArr[k];
+                                });
+
+                                if(findIdx > -1) {
+                                    existCnt++;
+                                } 
+                            }
+
+                            if(existCnt === currentElements.length) {
+                                N.splice(j, 1);
+                            } else {
+                                let findIdx = currentElements.findIndex((row) => {
+                                    return row === M[j];
+                                });
+
+                                if(findIdx > -1) {
+                                    currentElements = currentElements.concat(positiveArr).sort().reduce((a,b) => {
+                                        if (a.slice(-1)[0] !== b) 
+                                            a.push(b);
+                                        return a;
+                                    },[]);                            
+                                    checkbox.push(M[j]);
+                                    N.splice(j, 1);
+                                    break;
+                                }
+                            }
+                        } else {
+                            let findIdx = currentElements.findIndex((row) => {
+                                return row === M[j];
+                            });
+
+                            if(findIdx > -1) {
+                                currentElements = currentElements.concat(positiveArr).sort().reduce((a,b) => {
+                                    if (a.slice(-1)[0] !== b) 
+                                        a.push(b);
+                                    return a;
+                                },[]);                          
+                                checkbox.push(M[j]);
+                                N.splice(j, 1);
+                                break;
+                            }
+                        }
+                    }
+                } while (checkbox.length !== 0)
+
+                for(var j in currentElements) {
+                    blocks["ele"+tmpCurrentArr[i]][currentElements[j]] = 1;
+                }
+            }     
+
+            // console.log("set plus tmpSetArr : ", tmpSetArr);
+            // console.log("set auto plus blocks : ", blocks);
+
+            /**
+            * init minus 
+            */
+            tmpBeforeArr = [];
+            tmpCurrentArr = [];       
+            tmpSetArr = [];  
+
+            for(var i in arr_a) {
+                if(i === "block" + depth) {
+                    tmpCurrentArr = tmpCurrentArr.concat(arr_a[i]);    
+                } else {
+                    tmpBeforeArr = tmpBeforeArr.concat(arr_a[i]);                    
+                }
+            }
+
+            //console.log("setAutoValue minus init : ", tmpBeforeArr, tmpCurrentArr, pDataset, nDataset);
+
+            for(var j=0;j<tmpCurrentArr.length; j++) {
+                let tmp_a = tmpCurrentArr[j].split(",");
+                for(var i=0; i<tmpBeforeArr.length;i++) {
+                    let tmp_b = pDataset["data"+tmpBeforeArr[i]];                                
+                    let cnt = 0;
+                    
+                    for(var k in tmp_a) {
+                        let idx = tmp_b.findIndex((row) => {
+                            return row === tmp_a[k];
+                        });
+                        //console.log(tmp_b, tmp_a[k], idx, cnt);
+                        if(idx > -1) {
+                            cnt++;
+                        }
+                    }
+
+                    if(cnt === tmp_a.length) {
+                        if(nDataset["data"+tmpBeforeArr[i]].length > 0) {
+                            let val = nDataset["data"+tmpBeforeArr[i]];
+                            
+                            let index = tmpSetArr.findIndex((row) => {
+                                return row === val;
+                            });
+
+                            if(index === -1) {
+                                //tmpSetArr = Object.assign(tmpSetArr, val);
+                                if(tmpSetArr[tmpCurrentArr[j]] === undefined) {
+                                    tmpSetArr[tmpCurrentArr[j]] = [];
+                                }
+
+                                for(var l in val) {
+                                    var existIdx = tmpSetArr[tmpCurrentArr[j]].findIndex((row) => {
+                                        return row === val[l];
+                                    });
+
+                                    if(existIdx === -1) {
+                                        tmpSetArr[tmpCurrentArr[j]].push(val[l]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for(var i in tmpCurrentArr) {
+                for(var j in tmpSetArr[tmpCurrentArr[i]]) {                        
+                    blocks["ele"+tmpCurrentArr[i]][tmpSetArr[tmpCurrentArr[i]][j]] = -1;
+                }
+            }
+            // console.log("set minus tmpSetArr : ", tmpSetArr);
+            // console.log("set auto minus blocks : ", blocks);
+        }
+
+        function makeTable() {
+            let table = document.getElementById("result-table");
+            let rowCnt = table.rows.length;
+            if(rowCnt === 0) {
+                let row = table.insertRow(rowCnt);
+                let thStr = "<td></td>";
+                for(var i=0;i<exportExcel.length;i++) {
+                    thStr += "<td>"+exportExcel[i].code+"</td>";
+                }
+                row.innerHTML = thStr;
+                rowCnt++;
+
+                thStr = "<td>0</td>";
+                for(var i=0;i<exportExcel.length;i++) {
+                    thStr += "<td>-1</td>";
+                }
+                row = table.insertRow(rowCnt);
+                row.innerHTML = thStr;
+                rowCnt++;
+            } else if(depth === exportExcel.length - 1) {
+                // thStr = "<td>"+knowledgeStructure[0]+"</td>";
+                // for(var i=0;i<exportExcel.length;i++) {
+                //     thStr += "<td>1</td>";
+                // }
+                // row = table.insertRow(rowCnt);
+                // row.innerHTML = thStr;
+            }
+
+            for(var i in blocks) {
+                if(i.split(",").length === depth) {
+                    let trStr = "<td>"+i+"</td>";            
+                    for(var j in blocks[i]) {
+                        trStr +="<td>"+blocks[i][j]+"</td>";    
+                    }
+                    row = table.insertRow(rowCnt);
+                    row.innerHTML = trStr;
+                    rowCnt++;
+                }
+            }         
+        }
+
+        function makeHirarchy() {
+            //knowledgeStructure = ["1", "2", "1,2","1,3","2,3","1,2,3","1,2,3,4"];
+            //knowledge space 그리기
+            let data = [];
+            for(var j=0;j<knowledgeStructure.length; j++) {
+                if(data.length === 0) {
+                    data.push({
+                        "state": knowledgeStructure[j],
+                        "outerFridge": "0",
+                        "surmize": knowledgeStructure[j]
+                    });
+                } else {                    
+                    for(var i in data) {
+                        let arrRow = data[i].state.split(",");
+                        let arrKnowledgeStructure = knowledgeStructure[j].split(",");
+                        if(arrKnowledgeStructure.length === 1) {                            
+                            data.push({
+                                "state": knowledgeStructure[j],
+                                "outerFridge": "0",
+                                "surmize": knowledgeStructure[j]
+                            });
+                        } else if(arrKnowledgeStructure.length - arrRow.length === 1) {                            
+                            let count = 0;
+
+                            for(var l in arrRow) {
+                                for(var k in arrKnowledgeStructure) {
+                                    if(arrKnowledgeStructure[k].indexOf(arrRow[l]) > -1) {
+                                        count++;
+                                    }
+                                }
+                            }
+
+                            if(count === arrRow.length) {   
+                                let idx = data.findIndex((row) => {
+                                    return row.state === knowledgeStructure[j] && row.outerFridge === data[i].state;
+                                });
+
+                                let surmize = Object.assign([],knowledgeStructure[j].split(","));
+                                let condition = data[i].state.split(",");
+                                for(var l in condition) {
+                                    let index = surmize.findIndex((row) => {
+                                        return row === condition[l];
+                                    });
+                                    surmize.splice(index,1);
+                                }
+
+                                if(idx === -1) {
+                                    data.push({
+                                        "state": knowledgeStructure[j],
+                                        "outerFridge": data[i].state,
+                                        "surmize": surmize.join() + ""
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //console.log(data);
+            return data;
+        }
+
+        function renderHirarchy(data) {
+            let table = document.getElementById("hirarchy-table");
+            let row = table.insertRow(0);
+            let thStr = "<td>State</td><td>Outer Fridge</td><td>Surmize</td>";
+            row.innerHTML = thStr;
+            
+            for(var i=0;i<data.length;i++) {
+                let trStr = "<td>"+data[i].state+"</td><td>"+data[i].outerFridge+"</td><td>"+data[i].surmize+"</td>";
+                row = table.insertRow(i+1);
+                row.innerHTML = trStr;
+            }
+        }
+
+        function renderGraph() {
+            let g = {
+            nodes: [],
+            edges: []
+            },
+            N = 10,
+            E = 10,
+            colors = [
+            '#617db4',
+            '#668f3c',
+            '#c6583e',
+            '#b956af'
+            ];
+
+            let x = 1.0;
+            let y = 1.0;
+            let size = 0;
+            
+            for (i = 0; i < hirarchys.length; i++) {           
+                let idx = g.nodes.findIndex((row) => {
+                    return row.label === hirarchys[i].state;
+                });
+                
+                if(hirarchys[i].state.split(",").length !== size) {                    
+                    size = hirarchys[i].state.split(",").length;
+                    x = x + 30.1;
+                    y = y + 30.1;
+                } else {
+                    x = x + 50.1;
+                }
+
+                if(idx === -1) {
+                    g.nodes.push({
+                        id: 'n' + i,
+                        label: hirarchys[i].state,
+                        type: 'def',
+                        x: x,
+                        y: y,
+                        size: 1,
+                        color: colors[1]
+                    });
+                }
+
+                if(i > 0) {
+                    let index = g.nodes.findIndex((row) => {
+                        return row.label === hirarchys[i].outerFridge;
+                    });
+
+                    if(index > -1) {
+                        g.edges.push({
+                            id: 'e' + i,
+                            source: g.nodes[index].id,
+                            target: idx === -1 ? 'n' + i : g.nodes[idx].id,
+                            size: Math.random()
+                        });
+                    }
+                }
+            }
+
+            //(g);
+            s = new sigma({
+                graph: g,
+                renderer: {
+                    // IMPORTANT:
+                    // This works only with the canvas renderer, so the
+                    // renderer type set as "canvas" is necessary here.
+                    container: document.getElementById('graph-container'),
+                    type: 'svg'
+                },
+                settings: {
+                    minNodeSize: 8,
+                    enableCamera: false
+                }
+            });                
+        }
+    </script>
+</head>
+<body>
+    <!-- <input type="text" id="inputVal" style="width:400px;" value="0">
+    <button id="call">Call</button> -->
+    <input type="file" id="my_file_input">
+    <div id="render-question"></div>
+    <div style="margin-top: 10px;">
+        <table border="1" id="result-table">
+        </table>
+    </div>
+    <div id="result" style="margin-top: 10px;">
+
+    </div>
+    <div style="margin-top: 10px;">
+        <table border="1" id="hirarchy-table">
+        </table>
+    </div>
+    <div id="render-path" style="margin-top: 10px;">
+
+    </div>
+    <div id="graph-container"></div>
+</body>
+</html>
